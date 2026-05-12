@@ -1,36 +1,15 @@
 $(function () {
 
-  // ── Help icon tooltips ────────────────────────────────────────
-  var $tooltip = $('#help-tooltip');
-
-  $(document).on('mouseenter focus', '.help-icon', function (e) {
-    var text = $(this).data('help-text');
-    if (!text) return;
-    $tooltip.text(text).addClass('visible').attr('aria-hidden', 'false');
-    positionTooltip(e);
-  }).on('mousemove', '.help-icon', function (e) {
-    positionTooltip(e);
-  }).on('mouseleave blur', '.help-icon', function () {
-    $tooltip.removeClass('visible').attr('aria-hidden', 'true');
-  });
-
-  function positionTooltip(e) {
-    var x = e.clientX + 12;
-    var y = e.clientY + 12;
-    if (x + 250 > window.innerWidth) x = e.clientX - 260;
-    $tooltip.css({ left: x, top: y });
-  }
-
   // ── Accordion ─────────────────────────────────────────────────
   $('.accordion-toggle').on('click', function () {
     var $btn = $(this);
     var expanded = $btn.attr('aria-expanded') === 'true';
     var $body = $('#' + $btn.attr('aria-controls'));
-    $btn.attr('aria-expanded', !expanded);
+    $btn.attr('aria-expanded', String(!expanded));
     if (expanded) {
-      $body.prop('hidden', true);
+      $body.prop('hidden', true).attr('data-expanded', 'false');
     } else {
-      $body.prop('hidden', false);
+      $body.prop('hidden', false).attr('data-expanded', 'true');
     }
   });
 

@@ -6,39 +6,56 @@
   --navy-mid:   #243460;
   --gold:       #b8952a;
   --gold-light: #d4af4f;
-  --cream:      #f4f2ed;
+  --blue:       #1880f0;
+  --blue-hover: #64b5f6;
+  --blue-dark:  #044a94;
+  --link:       #337ab7;
+  --link-hover: #23527c;
   --white:      #ffffff;
-  --gray-50:    #f8f8f8;
-  --gray-100:   #eeeeee;
-  --gray-300:   #c8c8c8;
+  --section-bg: #eeeeee;
+  --sidebar-bg: #f7f7f7;
+  --gray-300:   #cccccc;
   --gray-500:   #777;
-  --gray-700:   #444;
-  --text:       #1e1e1e;
-  --danger:     #b91c1c;
-  --danger-bg:  #fef2f2;
-  --success:    #1e6f45;
-  --warning:    #92400e;
-  --warning-bg: #fffbeb;
+  --text:       #333333;
+  --danger:     #f5182b;
+  --danger-bg:  #fabec3;
 
   --radius-sm:  4px;
   --radius:     8px;
-  --radius-lg:  12px;
-  --shadow-sm:  0 1px 3px rgba(0,0,0,.12);
-  --shadow:     0 4px 16px rgba(0,0,0,.09);
+  --radius-lg:  10px;
+  --shadow-section: 0 0 10px rgba(0,0,0,.1);
+  --shadow-sm:      0 1px 3px rgba(0,0,0,.12);
 
-  --font-sans:  'Inter', 'Segoe UI', Arial, sans-serif;
+  --font-sans:  Arial, 'Segoe UI', sans-serif;
   --font-serif: 'Georgia', 'Times New Roman', serif;
 }
 
 body {
   font-family: var(--font-sans);
-  background: var(--cream);
+  background: var(--white);
   color: var(--text);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   font-size: 15px;
   line-height: 1.6;
+}
+
+/* ─── Typography ───────────────────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: bold;
+  margin-bottom: 0.5em;
+}
+
+p { margin-bottom: 1em; }
+
+a {
+  text-decoration: none;
+  color: var(--link);
+}
+
+a:hover {
+  color: var(--link-hover);
 }
 
 /* ─── Header ───────────────────────────────────────────────────── */
@@ -65,6 +82,7 @@ body {
   font-weight: 700;
   letter-spacing: .02em;
   line-height: 1.2;
+  margin-bottom: 0;
 }
 
 .header-titles p {
@@ -73,6 +91,7 @@ body {
   letter-spacing: .05em;
   text-transform: uppercase;
   margin-top: 3px;
+  margin-bottom: 0;
 }
 
 .header-rule {
@@ -92,7 +111,7 @@ body {
 }
 
 .nav-inner a {
-  color: var(--gray-300);
+  color: #c8c8c8;
   text-decoration: none;
   font-size: .84rem;
   letter-spacing: .03em;
@@ -112,25 +131,25 @@ body {
   flex: 1;
   max-width: 1240px;
   width: 100%;
-  margin: 28px auto;
-  padding: 0 24px;
+  margin: 20px auto;
+  padding: 0 20px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 0;
 }
 
-/* ─── Disclaimer ───────────────────────────────────────────────── */
+/* ─── Disclaimer (top-instructions) ───────────────────────────── */
 .disclaimer {
-  background: var(--warning-bg);
-  border: 1px solid var(--gold);
-  border-left: 4px solid var(--gold);
-  border-radius: var(--radius-sm);
-  padding: 13px 16px;
-  font-size: .84rem;
-  color: var(--warning);
+  background: var(--section-bg);
+  border: 1px solid var(--blue);
+  box-shadow: var(--shadow-section);
+  padding: 10px;
+  font-size: .88rem;
+  color: var(--text);
   display: flex;
   align-items: flex-start;
   gap: 10px;
+  margin-bottom: 0;
 }
 
 .disclaimer svg { flex-shrink: 0; margin-top: 2px; }
@@ -138,27 +157,31 @@ body {
 /* ─── Outer two-column layout ──────────────────────────────────── */
 .outer-layout {
   display: grid;
-  grid-template-columns: 1fr 290px;
-  gap: 24px;
+  grid-template-columns: 70% 30%;
+  gap: 0;
   align-items: start;
 }
 
 /* ─── Main content column ──────────────────────────────────────── */
 .main-content {
+  padding: 20px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 0;
+  overflow-wrap: break-word;
 }
 
-/* ─── Cards ────────────────────────────────────────────────────── */
+/* ─── Section containers (tab-content-container equivalent) ─────── */
+/* All cards in main content get the blue-border / eee-bg treatment  */
 .card {
-  background: var(--white);
-  border: 1px solid var(--gray-100);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow);
-  overflow: hidden;
+  background: var(--section-bg);
+  border: 1px solid var(--blue);
+  box-shadow: var(--shadow-section);
+  overflow: visible;
+  margin-bottom: 0;
 }
 
+/* Card with a navy header bar */
 .card-header {
   background: var(--navy);
   color: var(--white);
@@ -173,44 +196,93 @@ body {
   font-size: .95rem;
   font-weight: 600;
   letter-spacing: .02em;
+  margin-bottom: 0;
 }
 
 .card-header .card-icon { color: var(--gold-light); }
 
-.card-header--results { background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%); }
+.card-header--results {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
+}
 
-.card-body { padding: 20px; }
+.card-body { padding: 10px; }
+
+/* Case name card — plain, no header */
+.card-plain {
+  background: var(--white);
+  border: none;
+  box-shadow: none;
+  padding: 0 0 10px 0;
+}
+
+/* ─── Single-column display rows (combined income, total oblig.) ── */
+/* These match .single-column-container from the original           */
+.single-col-container {
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+  box-shadow: var(--shadow-section);
+  border: 1px solid var(--blue);
+  background: var(--section-bg);
+  overflow: visible;
+}
+
+.single-col-inner {
+  width: 50%;
+  text-align: left;
+}
+
+.single-col-inner label {
+  margin-bottom: 4px;
+}
 
 /* ─── Two-parent column grid ───────────────────────────────────── */
 .two-col-parents {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px;
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: 20px;
+  grid-auto-flow: row dense;
+  overflow: visible;
 }
 
-.parent-col { display: flex; flex-direction: column; }
+.parent-col {
+  display: flex;
+  flex-direction: column;
+}
 
 /* ─── Fieldsets ────────────────────────────────────────────────── */
+/* Fieldsets inside grid items have no border (matches original)   */
+.two-col-parents fieldset {
+  border: none;
+  padding: 0;
+  flex: 1;
+}
+
+/* Standalone fieldsets (outside grid) keep a light border */
 fieldset {
-  border: 1px solid var(--gray-100);
+  border: 1px solid var(--gray-300);
   border-radius: var(--radius-sm);
-  padding: 16px;
+  padding: 14px;
   flex: 1;
 }
 
 legend {
-  font-size: .78rem;
+  font-size: .82rem;
   font-weight: 700;
   color: var(--navy);
-  letter-spacing: .06em;
+  letter-spacing: .04em;
   text-transform: uppercase;
   padding: 0 6px;
-  background: var(--white);
+  background: var(--section-bg);
 }
 
 .results-fieldset {
-  border-color: var(--gold);
-  background: #fffdf5;
+  border-color: var(--blue);
+  background: var(--white);
+}
+
+.results-fieldset legend {
+  background: var(--white);
 }
 
 /* ─── Form elements ────────────────────────────────────────────── */
@@ -221,64 +293,54 @@ legend {
 
 label {
   display: block;
-  font-size: .82rem;
-  font-weight: 600;
-  color: var(--navy);
-  letter-spacing: .02em;
-  margin-bottom: 5px;
+  font-size: .88rem;
+  font-weight: normal;
+  color: var(--text);
+  margin-bottom: 0.5em;
   line-height: 1.4;
-}
-
-label .optional {
-  font-weight: 400;
-  color: var(--gray-500);
-  font-size: .77rem;
 }
 
 input[type="text"],
 input[type="number"],
 select {
   width: 100%;
-  padding: 8px 12px;
-  border: 1px solid var(--gray-300);
-  border-radius: var(--radius-sm);
+  height: 2em;
+  padding: 0.5em;
+  border: 1px solid #cccccc;
   font: inherit;
   font-size: .88rem;
   color: var(--text);
   background: var(--white);
-  transition: border-color .15s, box-shadow .15s;
-  -webkit-appearance: none;
-  appearance: none;
+  margin-bottom: 0;
 }
 
 input[type="text"]:focus,
 input[type="number"]:focus,
 select:focus {
-  outline: none;
-  border-color: var(--navy-mid);
-  box-shadow: 0 0 0 3px rgba(36,52,96,.12);
+  outline: 2px solid var(--blue);
+  outline-offset: 0;
 }
 
+select { height: auto; padding: 6px 8px; }
+
 input.computed-field {
-  background: var(--gray-50);
+  background: #f0f0f0;
   color: var(--navy);
   font-weight: 600;
-  border-color: var(--gray-100);
   cursor: default;
 }
 
 input.computed-field:focus {
-  box-shadow: none;
-  border-color: var(--gray-300);
+  outline: none;
 }
 
 .input-prefix {
   position: relative;
 }
 
-.input-prefix span {
+.input-prefix > span:first-child {
   position: absolute;
-  left: 10px;
+  left: 8px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--gray-500);
@@ -287,7 +349,7 @@ input.computed-field:focus {
   z-index: 1;
 }
 
-.input-prefix input { padding-left: 22px; }
+.input-prefix input { padding-left: 20px; }
 
 .input-prefix--wide { max-width: 320px; }
 
@@ -296,33 +358,33 @@ input.computed-field:focus {
   color: var(--gray-500);
   margin-top: 5px;
   line-height: 1.5;
+  margin-bottom: 0;
 }
 
-/* ─── Computed field wrapper (net income) ──────────────────────── */
+/* ─── Computed field wrapper (net income with close-icon) ────────── */
 .computed-field-wrap {
   position: relative;
 }
 
 .close-icon {
   position: absolute;
-  right: 10px;
+  right: 8px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: .75rem;
+  font-size: .8rem;
   color: var(--danger);
   font-weight: 700;
   pointer-events: none;
   z-index: 1;
 }
 
-/* ─── Computed display divs (read-only output) ─────────────────── */
+/* ─── Computed display divs (read-only output values) ────────────── */
 .computed-display {
-  min-height: 38px;
-  padding: 8px 12px;
-  background: var(--gray-50);
-  border: 1px solid var(--gray-100);
-  border-radius: var(--radius-sm);
-  font-size: .88rem;
+  min-height: 2em;
+  padding: 4px 8px;
+  background: var(--white);
+  border: 1px solid #cccccc;
+  font-size: .95rem;
   font-weight: 600;
   color: var(--navy);
   display: flex;
@@ -336,27 +398,21 @@ input.computed-field:focus {
 }
 
 .computed-display--pct {
-  font-size: 1.1rem;
-  font-family: var(--font-serif);
-  color: var(--navy-mid);
+  font-size: 1.05rem;
+  color: var(--navy);
 }
 
 .computed-display--total {
   font-size: 1.05rem;
   font-weight: 700;
   color: var(--navy);
-  background: #f0f4ff;
-  border-color: #c7d2fe;
 }
 
 /* ─── Combined income row ──────────────────────────────────────── */
 .combined-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 18px;
-  margin-top: 18px;
-  padding-top: 16px;
-  border-top: 1px solid var(--gray-100);
+  gap: 20px;
 }
 
 .combined-item label {
@@ -364,12 +420,6 @@ input.computed-field:focus {
 }
 
 /* ─── Total obligation row ─────────────────────────────────────── */
-.total-obligation-row {
-  margin-top: 18px;
-  padding-top: 16px;
-  border-top: 1px solid var(--gray-100);
-}
-
 .total-obligation-row label { margin-bottom: 8px; }
 
 /* ─── Warning messages ─────────────────────────────────────────── */
@@ -378,145 +428,244 @@ input.computed-field:focus {
   font-size: .8rem;
   color: var(--danger);
   min-height: 0;
+  position: relative;
+  display: inline-block;
 }
 
 .warning-message-container:not(:empty) {
   background: var(--danger-bg);
-  border: 1px solid #fecaca;
-  border-radius: var(--radius-sm);
+  border: 1px solid var(--danger);
   padding: 6px 10px;
 }
 
-/* ─── Help icon tooltips ───────────────────────────────────────── */
+/* ─── Help icon — CSS tooltip via ::after ────────────────────────
+   Matches original: data-help-text, blue bg, hover show           */
 .help-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
-  height: 16px;
-  background: var(--navy-mid);
-  color: var(--white);
-  border-radius: 50%;
-  font-size: .68rem;
-  font-weight: 700;
+  font-size: 18px;
+  font-weight: bold;
+  color: #121314;
   cursor: help;
-  margin-left: 5px;
+  position: relative;
+  padding-left: 5px;
+  display: inline;
   vertical-align: middle;
-  flex-shrink: 0;
   user-select: none;
 }
 
-.help-tooltip {
-  position: fixed;
-  z-index: 9999;
-  max-width: 240px;
-  background: var(--navy);
+.help-icon::after {
+  content: attr(data-help-text);
+  position: absolute;
+  background-color: var(--blue-dark);
+  border: 1px solid #ddd;
+  padding: 10px;
+  width: 250px;
+  display: none;
+  top: 100%;
+  left: 0;
+  z-index: 100;
   color: var(--white);
-  font-size: .78rem;
-  line-height: 1.5;
-  padding: 8px 12px;
-  border-radius: var(--radius-sm);
-  box-shadow: 0 4px 16px rgba(0,0,0,.2);
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity .15s;
+  font-size: .8rem;
+  font-weight: normal;
+  line-height: 1.4;
 }
 
-.help-tooltip.visible { opacity: 1; }
+.help-icon:hover::after,
+.help-icon:focus::after {
+  display: block;
+}
 
 /* ─── Finalize row ─────────────────────────────────────────────── */
 .finalize-row {
   margin-top: 20px;
-  padding-top: 18px;
-  border-top: 1px solid var(--gray-100);
+  padding-top: 0;
   display: flex;
   align-items: flex-end;
   gap: 16px;
   flex-wrap: wrap;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
 }
 
 .finalize-row .form-group {
-  flex: 1;
-  min-width: 200px;
+  width: 100%;
   margin-bottom: 0;
+  text-align: center;
 }
 
-/* ─── Buttons ──────────────────────────────────────────────────── */
+.finalize-row select {
+  width: auto;
+  display: inline-block;
+}
+
+/* ─── Buttons — all blue #1880f0, radius 10px ───────────────────── */
+/* Generic .btn class (used for non-ID buttons if any)             */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 7px;
-  padding: 10px 20px;
-  border-radius: var(--radius-sm);
+  border: 2px solid var(--blue);
+  background-color: var(--blue);
+  border-radius: var(--radius-lg);
   font: inherit;
-  font-size: .88rem;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: normal;
   cursor: pointer;
-  border: none;
-  transition: background .15s, transform .1s, box-shadow .15s;
-  letter-spacing: .02em;
+  color: var(--white);
+  transition: background-color .15s;
   white-space: nowrap;
 }
 
-.btn:active { transform: translateY(1px); }
+.btn:hover { background-color: var(--blue-hover); border-color: var(--blue-hover); }
+.btn:active { opacity: .9; }
 
-.btn-primary { background: var(--navy); color: var(--white); }
-.btn-primary:hover { background: var(--navy-mid); box-shadow: var(--shadow-sm); }
-
-.btn-outline {
-  background: transparent;
-  color: var(--navy);
-  border: 1.5px solid var(--navy);
-}
-.btn-outline:hover { background: var(--gray-50); }
-
-.btn-lg { padding: 11px 24px; font-size: .9rem; }
-.btn-block { width: 100%; }
-
-/* ─── Divider ──────────────────────────────────────────────────── */
-.calc-divider {
-  height: 4px;
-  background: linear-gradient(to right, var(--navy), var(--navy-mid), var(--navy));
-  border-radius: 2px;
-}
-
-/* ─── Results card ─────────────────────────────────────────────── */
-.results-card { border-color: var(--gold); }
-
-.results-label {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--navy);
-  margin-bottom: 10px;
-}
-
-.result-owed {
-  min-height: 56px;
-  padding: 12px 16px;
-  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 100%);
-  border-radius: var(--radius);
-  font-family: var(--font-serif);
-  font-size: 1.6rem;
-  font-weight: 700;
+/* Specific button overrides matching original dimensions */
+#calculate-support {
+  border: 2px solid var(--blue);
+  background-color: var(--blue);
+  border-radius: var(--radius-lg);
+  font-size: 16px;
+  height: 25px;
+  width: 120px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: var(--white);
+  margin-top: 20px;
+  margin-bottom: 20px;
+  padding: 0;
+  cursor: pointer;
+}
+
+#calculate-support:hover { background-color: var(--blue-hover); }
+
+.accordion-toggle {
+  border: 2px solid var(--blue);
+  background-color: var(--blue);
+  border-radius: var(--radius-lg);
+  font-size: 16px;
+  height: 25px;
+  width: 120px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  margin-top: 20px;
+  margin-bottom: 20px;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: normal;
+}
+
+.accordion-toggle:hover { background-color: var(--blue-hover); }
+
+/* + / - indicator via ::before */
+.accordion-toggle::before {
+  content: "+";
+  margin-right: 4px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.accordion-toggle[aria-expanded="true"]::before {
+  content: "-";
+}
+
+/* Hide the SVG chevron — we use ::before instead */
+.accordion-toggle svg { display: none; }
+
+#print-calc {
+  border: 2px solid var(--blue);
+  background-color: var(--blue);
+  border-radius: var(--radius-lg);
+  font-size: 16px;
+  height: 25px;
+  width: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
+  color: var(--white);
+  padding: 0;
+  cursor: pointer;
+  margin: 20px auto;
+  font-family: inherit;
+  font-weight: normal;
+}
+
+#print-calc:hover { background-color: var(--blue-hover); }
+
+/* Hide the SVG inside print button since original has text only */
+#print-calc svg { display: none; }
+
+#finalize-calculation {
+  border: 2px solid var(--blue);
+  background-color: var(--blue);
+  border-radius: var(--radius-lg);
+  font-size: 16px;
+  height: 25px;
+  width: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  padding: 0;
+  cursor: pointer;
+  margin: 20px auto;
+  font-family: inherit;
+  font-weight: normal;
+}
+
+#finalize-calculation:hover { background-color: var(--blue-hover); }
+
+/* Hide SVG inside finalize button */
+#finalize-calculation svg { display: none; }
+
+/* ─── Calc divider (double rule) ───────────────────────────────── */
+.calc-divider {
+  border-bottom: 4px solid #333;
+  margin: 20px 0;
+}
+
+/* ─── Results card ─────────────────────────────────────────────── */
+.results-card {
+  border: 2px solid #333;
+  background-color: #f0f0f0;
+}
+
+.results-label {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--text);
+  display: block;
+  margin-bottom: 8px;
+}
+
+.result-owed {
+  min-height: 2em;
+  padding: 8px 12px;
+  background: var(--white);
+  border: 1px solid #cccccc;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--navy);
+  display: flex;
+  align-items: center;
 }
 
 .result-owed:empty::before {
   content: '—';
-  font-size: 1.2rem;
   opacity: .4;
+  font-weight: 400;
 }
 
 /* ─── Calculation messages ─────────────────────────────────────── */
 .calc-messages {
   margin-top: 10px;
   min-height: 40px;
-  font-size: .85rem;
-  color: var(--gray-700);
+  font-size: .88rem;
+  color: var(--text);
   line-height: 1.6;
 }
 
@@ -528,103 +677,117 @@ input.computed-field:focus {
 
 /* ─── Right sidebar ────────────────────────────────────────────── */
 .right-sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  position: sticky;
-  top: 20px;
+  padding-top: 20px;
+  padding-right: 0;
 }
 
-.sidebar-card .card-header h2 {
-  font-size: .88rem;
-}
-
-/* ─── Accordion ────────────────────────────────────────────────── */
-.accordion-toggle {
+/* The sidebar inner panel */
+.right-sidebar > .sidebar-inner {
   width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: none;
+  background-color: var(--sidebar-bg);
+  border: 1px solid var(--blue);
+  padding: 10px;
+}
+
+/* Sidebar cards — transparent inside the blue-bordered sidebar    */
+.sidebar-card {
+  background: transparent;
   border: none;
-  font: inherit;
-  font-size: .88rem;
-  font-weight: 700;
-  color: var(--navy);
-  cursor: pointer;
+  box-shadow: none;
+}
+
+.sidebar-card .card-body {
   padding: 0;
-  text-align: left;
 }
 
-.accordion-toggle svg {
-  transition: transform .2s;
-  flex-shrink: 0;
+/* Sidebar section dividers */
+.sidebar-divider {
+  border-bottom: 2px solid #333;
+  margin: 20px 0;
 }
 
-.accordion-toggle[aria-expanded="true"] svg {
-  transform: rotate(180deg);
+/* ─── Table 1 tool / Deduction calc tool ──────────────────────── */
+.table1-tool,
+.deduction-tool,
+.print-tool,
+.reference-tool {
+  text-align: center;
+  margin-bottom: 20px;
 }
 
+.table1-tool input,
+.table1-tool select,
+.deduction-tool input {
+  margin-bottom: 1em;
+}
+
+/* ─── Accordion body ───────────────────────────────────────────── */
 .accordion-body {
-  margin-top: 14px;
-  padding-top: 14px;
-  border-top: 1px solid var(--gray-100);
+  margin-top: 10px;
+  text-align: center;
 }
+
+.accordion-body[hidden] { display: none; }
 
 /* ─── Deduction total ──────────────────────────────────────────── */
 .deduction-total-row {
   margin-top: 14px;
   padding-top: 12px;
-  border-top: 2px solid var(--navy);
+  border-top: 2px solid #333;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
 }
 
-.deduction-total-row label {
-  margin-bottom: 0;
-}
+.deduction-total-row label { margin-bottom: 0; }
 
 .deduction-total {
   font-size: 1rem;
   font-weight: 700;
   color: var(--navy);
-  font-family: var(--font-serif);
 }
 
 /* ─── Reference list ───────────────────────────────────────────── */
+.reference-tool h2 { margin-bottom: 10px; }
+
 .ref-list {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .ref-list li {
   display: flex;
   align-items: center;
-  gap: 7px;
-  font-size: .84rem;
+  gap: 6px;
+  justify-content: flex-end; /* right-aligned like original */
 }
 
 .ref-list svg { color: var(--gold); flex-shrink: 0; }
 
 .ref-list a {
-  color: var(--navy-mid);
+  color: var(--link);
   text-decoration: none;
-  font-weight: 600;
 }
 
 .ref-list a:hover {
-  color: var(--gold);
+  color: var(--link-hover);
   text-decoration: underline;
+}
+
+/* ─── Support amount display ───────────────────────────────────── */
+#support-amount {
+  font-weight: 700;
+  color: var(--navy);
+  font-size: 1rem;
 }
 
 /* ─── Footer ───────────────────────────────────────────────────── */
 .site-footer {
   background: var(--navy);
-  color: var(--gray-300);
+  color: #c8c8c8;
   padding: 22px 24px;
   text-align: center;
   font-size: .78rem;
@@ -642,17 +805,33 @@ input.computed-field:focus {
 }
 
 /* ─── Responsive ───────────────────────────────────────────────── */
-@media (max-width: 900px) {
+@media (max-width: 768px) {
   .outer-layout {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .main-content {
+    width: 100%;
   }
 
   .right-sidebar {
-    position: static;
+    width: 100%;
+    padding-top: 0;
   }
-}
 
-@media (max-width: 640px) {
+  .right-sidebar > .sidebar-inner {
+    width: 100%;
+  }
+
+  .single-col-container {
+    width: 100%;
+  }
+
+  .single-col-inner {
+    width: 100%;
+  }
+
   .two-col-parents,
   .combined-row {
     grid-template-columns: 1fr;
@@ -660,25 +839,22 @@ input.computed-field:focus {
 
   .finalize-row {
     flex-direction: column;
-    align-items: stretch;
+    align-items: center;
   }
 
   .header-titles h1 { font-size: 1.1rem; }
-
-  .page-wrapper { padding: 0 14px; margin: 16px auto; }
 }
 
 /* ─── Print ────────────────────────────────────────────────────── */
 @media print {
   .site-nav,
   .right-sidebar,
-  .finalize-row button,
+  #finalize-calculation,
   .disclaimer svg { display: none; }
 
   body { background: white; }
 
-  .card { box-shadow: none; border: 1px solid #ccc; }
-
+  .card { box-shadow: none; }
   .site-header { background: white; color: black; }
   .card-header { background: #eee; color: black; }
   .card-header h2 { color: black; }

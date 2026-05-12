@@ -154,19 +154,20 @@
               </div><!-- /two-col-parents -->
             </form>
 
-            <!-- Combined income display -->
-            <div class="combined-row">
-              <div class="combined-item">
-                <label for="combined-net-income">Combined Monthly Net Income:</label>
-                <div id="combined-net-income" class="computed-display" aria-live="polite"></div>
-              </div>
-              <div class="combined-item">
-                <label for="combined-annual-net-income">Combined Annual Net Income:</label>
-                <div id="combined-annual-net-income" class="computed-display" aria-live="polite"></div>
-              </div>
-            </div>
           </div>
         </section>
+
+        <!-- Combined income — single-column centered display -->
+        <div class="single-col-container">
+          <div class="single-col-inner">
+            <label for="combined-net-income">Combined Monthly Net Income:</label>
+            <div id="combined-net-income" class="computed-display" aria-live="polite"></div>
+            <br>
+            <label for="combined-annual-net-income">Combined Annual Net Income:</label>
+            <br>
+            <div id="combined-annual-net-income" class="computed-display" aria-live="polite"></div>
+          </div>
+        </div>
 
         <!-- ── Section 2: Percentage Contribution ───────────── -->
         <section class="card" aria-labelledby="pct-heading">
@@ -277,13 +278,17 @@
               </div>
             </form>
 
-            <!-- Total obligation display -->
-            <div class="total-obligation-row">
-              <label>Total Obligation:</label>
-              <div id="total-obligation" class="computed-display computed-display--total" aria-live="polite"></div>
-            </div>
           </div>
         </section>
+
+        <!-- Total obligation — single-column centered display -->
+        <div class="single-col-container">
+          <div class="single-col-inner">
+            <label for="total-obligation">Total Obligation:</label>
+            <br>
+            <div id="total-obligation" class="computed-display computed-display--total" aria-live="polite"></div>
+          </div>
+        </div>
 
         <!-- ── Section 5: Monthly Share, Credits, Nights ──────── -->
         <section class="card" aria-labelledby="share-heading">
@@ -379,12 +384,7 @@
                     <option value="basic-calc">Basic Net Income Calculation (Worksheet 1)</option>
                   </select>
                 </div>
-                <button id="finalize-calculation" class="btn btn-primary btn-lg" type="button">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <polyline points="20 6 9 17 4 12"/>
-                  </svg>
-                  Finalize Calculation
-                </button>
+                <button id="finalize-calculation" type="button">Finalize Calculation</button>
               </div>
             </form>
           </div>
@@ -438,26 +438,17 @@
            RIGHT SIDEBAR
            ════════════════════════════════════════════════════════ -->
       <aside class="right-sidebar" aria-label="Calculator tools">
+        <div class="sidebar-inner">
 
-        <!-- Table 1 tool -->
-        <div class="card sidebar-card">
-          <div class="card-header">
-            <svg class="card-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/>
-              <line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/>
-            </svg>
-            <h2>Table 1 Calculator</h2>
-          </div>
-          <div class="card-body">
+          <!-- Table 1 tool -->
+          <div class="table1-tool">
+            <h4>Table 1 Calculator</h4>
             <form>
-              <div class="form-group">
+              <div>
                 <label for="monthly-income">Combined Monthly Net Income:</label>
-                <div class="input-prefix">
-                  <span>$</span>
-                  <input type="number" id="monthly-income" name="monthly-income" min="0" step="0.01" placeholder="0.00" />
-                </div>
+                <input type="number" id="monthly-income" name="monthly-income" min="0" step="0.01" placeholder="0.00" />
               </div>
-              <div class="form-group">
+              <div>
                 <label for="num-children">Number of Children:</label>
                 <select id="num-children" name="num-children">
                   <option value="1">1</option>
@@ -468,134 +459,92 @@
                   <option value="6">6</option>
                 </select>
               </div>
-              <button id="calculate-support" class="btn btn-primary btn-block" type="button">Calculate Support</button>
-              <div class="form-group mt-12">
+              <button id="calculate-support" type="button">Calculate Support</button>
+              <div>
                 <label>Calculated Support Amount:</label>
-                <div class="computed-display" id="support-amount" aria-live="polite"></div>
+                <span id="support-amount" aria-live="polite"></span>
               </div>
             </form>
           </div>
-        </div>
 
-        <!-- Deduction calculator accordion -->
-        <div class="card sidebar-card">
-          <div class="card-body">
+          <div class="sidebar-divider"></div>
+
+          <!-- Deduction calculator accordion -->
+          <div class="accordion-container">
             <button class="accordion-toggle" type="button" aria-expanded="false" aria-controls="deduction-calc-body">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <polyline points="6 9 12 15 18 9"/>
-              </svg>
               Deduction Calculator
             </button>
-            <div class="accordion-body" id="deduction-calc-body" hidden>
-              <p class="form-hint mt-8">Use this tool if you are unsure of total deductions. Fill in applicable amounts and copy the total.
-                <span class="help-icon" data-help-text="Complete the fields below to calculate total deductions for a parent." tabindex="0">?</span>
-              </p>
-              <div class="form-group">
-                <label for="taxes">Federal &amp; State Taxes:</label>
-                <div class="input-prefix"><span>$</span>
-                  <input type="number" id="taxes" name="taxes" min="0" step="0.01" placeholder="0.00" />
-                </div>
+            <div class="accordion-body deduction-calc" id="deduction-calc-body" data-expanded="false" hidden>
+              <h4>Total Deduction Calculator
+                <span class="help-icon" data-help-text="Complete fields for total deductions." tabindex="0">?</span>
+              </h4>
+              <p>You can use this if you are unsure of total deductions.</p>
+              <div>
+                <label for="taxes">Taxes:</label>
+                <input type="number" id="taxes" name="taxes" min="0" step="0.01" placeholder="0.00" />
               </div>
-              <div class="form-group">
+              <div>
                 <label for="fica">FICA:</label>
-                <div class="input-prefix"><span>$</span>
-                  <input type="number" id="fica" name="fica" min="0" step="0.01" placeholder="0.00" />
-                </div>
+                <input type="number" id="fica" name="fica" min="0" step="0.01" placeholder="0.00" />
               </div>
-              <div class="form-group">
+              <div>
                 <label for="retirement">Retirement:</label>
-                <div class="input-prefix"><span>$</span>
-                  <input type="number" id="retirement" name="retirement" min="0" step="0.01" placeholder="0.00" />
-                </div>
+                <input type="number" id="retirement" name="retirement" min="0" step="0.01" placeholder="0.00" />
               </div>
-              <div class="form-group">
-                <label for="child-support-previously-ordered">Child Support Previously Ordered (other children):</label>
-                <div class="input-prefix"><span>$</span>
-                  <input type="number" id="child-support-previously-ordered" name="child-support-previously-ordered" min="0" step="0.01" placeholder="0.00" />
-                </div>
+              <div>
+                <label for="child-support-previously-ordered">Child support previously ordered for other children:</label>
+                <input type="number" id="child-support-previously-ordered" name="child-support-previously-ordered" min="0" step="0.01" placeholder="0.00" />
               </div>
-              <div class="form-group">
-                <label for="regular-support-for-other-children">Regular Support for Other Children:</label>
-                <div class="input-prefix"><span>$</span>
-                  <input type="number" id="regular-support-for-other-children" name="regular-support-for-other-children" min="0" step="0.01" placeholder="0.00" />
-                </div>
+              <div>
+                <label for="regular-support-for-other-children">Regular support for other children:</label>
+                <input type="number" id="regular-support-for-other-children" name="regular-support-for-other-children" min="0" step="0.01" placeholder="0.00" />
               </div>
-              <div class="form-group">
-                <label for="cost-to-parent-for-health-insurance">Cost to Parent for Health Insurance (self only):</label>
-                <div class="input-prefix"><span>$</span>
-                  <input type="number" id="cost-to-parent-for-health-insurance" name="cost-to-parent-for-health-insurance" min="0" step="0.01" placeholder="0.00" />
-                </div>
+              <div>
+                <label for="cost-to-parent-for-health-insurance">Cost to the parent for health insurance for self:</label>
+                <input type="number" id="cost-to-parent-for-health-insurance" name="cost-to-parent-for-health-insurance" min="0" step="0.01" placeholder="0.00" />
               </div>
-              <div class="form-group">
-                <label for="child-tax-credit">Deductions for Child Tax Credits:</label>
-                <div class="input-prefix"><span>$</span>
-                  <input type="number" id="child-tax-credit" name="child-tax-credit" min="0" step="0.01" placeholder="0.00" />
-                </div>
+              <div>
+                <label for="child-tax-credit">Deductions for child tax credits:</label>
+                <input type="number" id="child-tax-credit" name="child-tax-credit" min="0" step="0.01" placeholder="0.00" />
               </div>
-              <div class="form-group">
+              <div>
                 <label for="other">Other:</label>
-                <div class="input-prefix"><span>$</span>
-                  <input type="number" id="other" name="other" min="0" step="0.01" placeholder="0.00" />
-                </div>
+                <input type="number" id="other" name="other" min="0" step="0.01" placeholder="0.00" />
               </div>
-              <div class="deduction-total-row">
-                <label>Total Deductions:</label>
-                <span id="total" class="deduction-total" aria-live="polite"></span>
+              <div class="sidebar-divider"></div>
+              <div class="sidebar-divider"></div>
+              <div>
+                <label for="total">Total:</label><br>
+                <span id="total" aria-live="polite"></span>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Print -->
-        <div class="card sidebar-card">
-          <div class="card-body">
-            <p class="form-hint">Printable version opens in a new tab.</p>
-            <button id="print-calc" class="btn btn-outline btn-block mt-8" type="button">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <polyline points="6 9 6 2 18 2 18 9"/>
-                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
-                <rect x="6" y="14" width="12" height="8"/>
-              </svg>
-              Print
-            </button>
-          </div>
-        </div>
+          <div class="sidebar-divider"></div>
 
-        <!-- Reference material -->
-        <div class="card sidebar-card">
-          <div class="card-header">
-            <svg class="card-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-            </svg>
-            <h2>Reference Material</h2>
+          <!-- Print -->
+          <div class="print-tool">
+            <p>Printable version, opens in a new tab.</p>
+            <button id="print-calc" type="button">Print</button>
           </div>
-          <div class="card-body">
-            <ul class="ref-list">
-              <li>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                  <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
-                </svg>
-                <a href="https://supremecourt.nebraska.gov/sites/default/files/worksheet1.pdf" target="_blank" rel="noopener">NE Worksheet 1</a>
-              </li>
-              <li>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                  <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
-                </svg>
-                <a href="https://supremecourt.nebraska.gov/sites/default/files/childsup_table.pdf" target="_blank" rel="noopener">NE Table 1</a>
-              </li>
-              <li>
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-                  <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
-                </svg>
-                <a href="https://supremecourt.nebraska.gov/sites/default/files/worksheet3.pdf" target="_blank" rel="noopener">NE Worksheet 3</a>
-              </li>
-            </ul>
-          </div>
-        </div>
 
+          <div class="sidebar-divider"></div>
+
+          <!-- Reference material -->
+          <div class="reference-tool reference-material">
+            <h4>Reference Material</h4>
+            <p class="right-aligned-link">
+              <a href="https://supremecourt.nebraska.gov/sites/default/files/worksheet1.pdf" target="_blank" rel="noopener">NE Worksheet 1</a>
+            </p>
+            <p class="right-aligned-link">
+              <a href="https://supremecourt.nebraska.gov/sites/default/files/childsup_table.pdf" target="_blank" rel="noopener">NE Table 1</a>
+            </p>
+            <p class="right-aligned-link">
+              <a href="https://supremecourt.nebraska.gov/sites/default/files/worksheet3.pdf" target="_blank" rel="noopener">NE Worksheet 3</a>
+            </p>
+          </div>
+
+        </div><!-- /sidebar-inner -->
       </aside><!-- /right-sidebar -->
 
     </div><!-- /outer-layout -->
@@ -612,9 +561,6 @@
   <!-- Hidden alert-shown flags (used by calculation JS) -->
   <div id="motherinsalertShown" style="display:none;"></div>
   <div id="fatherinsalertShown" style="display:none;"></div>
-
-  <!-- Tooltip element -->
-  <div id="help-tooltip" class="help-tooltip" role="tooltip" aria-hidden="true"></div>
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="js/calculator.js"></script>
