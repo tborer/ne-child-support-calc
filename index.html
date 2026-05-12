@@ -12,7 +12,6 @@
   <!-- ── Header ───────────────────────────────────────────────── -->
   <header class="site-header">
     <div class="header-inner">
-      <!-- Nebraska state seal placeholder (inline SVG) -->
       <svg class="header-seal" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <circle cx="26" cy="26" r="25" fill="#243460" stroke="#b8952a" stroke-width="2"/>
         <circle cx="26" cy="26" r="20" fill="none" stroke="#b8952a" stroke-width="1" stroke-dasharray="3 2"/>
@@ -38,367 +37,569 @@
     </div>
   </nav>
 
-  <!-- ── Main content ──────────────────────────────────────────── -->
-  <main class="site-main">
+  <!-- ── Page wrapper ──────────────────────────────────────────── -->
+  <div class="page-wrapper">
 
-    <!-- Disclaimer -->
+    <!-- ── Disclaimer ─────────────────────────────────────────── -->
     <div class="disclaimer" role="note">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b8952a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r=".5" fill="#b8952a"/>
       </svg>
       <span>
-        <strong>Informational use only.</strong> This tool estimates child support based on Nebraska Child Support Guidelines.
-        Results are not legal advice. Consult a licensed Nebraska attorney for guidance on your specific situation.
-        Final orders are determined by the court.
+        Please remember that the following does not constitute legal advice. Step through the main sections and use the right sidebar tools for help as needed.
+        Input income items, deductions, insurance, medical support, and nights spent to see the calculation.
+        This uses browser popups for important messages — please enable popups for this site.
+        <strong>Select Joint Physical Custody or Basic calculation at the bottom.</strong>
       </span>
     </div>
 
-    <!-- ── Calculator card ────────────────────────────────────── -->
-    <section class="card" aria-labelledby="calc-heading">
-      <div class="card-header">
-        <svg class="card-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/>
-          <line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/>
-        </svg>
-        <h2 id="calc-heading">Child Support Worksheet</h2>
-      </div>
-      <div class="card-body">
+    <!-- ── Two-column outer layout ────────────────────────────── -->
+    <div class="outer-layout">
 
-        <!-- Section tabs -->
-        <div class="section-tabs" role="tablist">
-          <button class="section-tab active" role="tab" aria-selected="true"  data-tab="income">1 &mdash; Income</button>
-          <button class="section-tab"         role="tab" aria-selected="false" data-tab="custody">2 &mdash; Custody</button>
-          <button class="section-tab"         role="tab" aria-selected="false" data-tab="deductions">3 &mdash; Deductions</button>
-          <button class="section-tab"         role="tab" aria-selected="false" data-tab="expenses">4 &mdash; Expenses</button>
-        </div>
+      <!-- ════════════════════════════════════════════════════════
+           MAIN CALCULATOR COLUMN
+           ════════════════════════════════════════════════════════ -->
+      <main class="main-content" id="main-calc">
 
-        <!-- ── Tab 1: Income ───────────────────────────────────── -->
-        <div class="form-section active" id="tab-income" role="tabpanel">
-
-          <fieldset>
-            <legend>Custodial Parent (CP)</legend>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="cp-gross-income">Gross Monthly Income</label>
-                <div class="input-prefix"><span>$</span>
-                  <input type="number" id="cp-gross-income" min="0" step="1" placeholder="0" />
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="cp-income-type">Income Type</label>
-                <select id="cp-income-type">
-                  <option value="employment">W-2 Employment</option>
-                  <option value="self">Self-Employment</option>
-                  <option value="mixed">Mixed</option>
-                  <option value="imputed">Imputed</option>
-                </select>
-              </div>
-            </div>
-          </fieldset>
-
-          <fieldset>
-            <legend>Non-Custodial Parent (NCP)</legend>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="ncp-gross-income">Gross Monthly Income</label>
-                <div class="input-prefix"><span>$</span>
-                  <input type="number" id="ncp-gross-income" min="0" step="1" placeholder="0" />
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="ncp-income-type">Income Type</label>
-                <select id="ncp-income-type">
-                  <option value="employment">W-2 Employment</option>
-                  <option value="self">Self-Employment</option>
-                  <option value="mixed">Mixed</option>
-                  <option value="imputed">Imputed</option>
-                </select>
-              </div>
-            </div>
-          </fieldset>
-
-        </div>
-
-        <!-- ── Tab 2: Custody ──────────────────────────────────── -->
-        <div class="form-section" id="tab-custody" role="tabpanel">
-
-          <div class="form-group">
-            <label>Number of Children</label>
-            <div class="radio-group">
-              <label><input type="radio" name="num-children" value="1" checked /> 1 child</label>
-              <label><input type="radio" name="num-children" value="2" /> 2 children</label>
-              <label><input type="radio" name="num-children" value="3" /> 3 children</label>
-              <label><input type="radio" name="num-children" value="4" /> 4 or more children</label>
+        <!-- Case name -->
+        <div class="card">
+          <div class="card-body">
+            <div class="form-group mb-0">
+              <label for="case-name">Name or Case Name / Number:</label>
+              <input type="text" id="case-name" placeholder="e.g. Smith v. Smith — Case No. CI 24-000" />
             </div>
           </div>
-
-          <div class="form-group">
-            <label for="ncp-overnights">NCP Parenting Time <span class="optional">(overnights / year)</span></label>
-            <input type="number" id="ncp-overnights" min="0" max="365" step="1" placeholder="73" />
-            <p class="form-hint">Standard parenting plan: 73 nights (every other weekend + holidays). Enter actual number if known.</p>
-          </div>
-
-          <fieldset>
-            <legend>Custody Arrangement</legend>
-            <div class="radio-group">
-              <label><input type="radio" name="custody-type" value="sole" checked /> Sole physical custody (NCP &lt; 110 nights)</label>
-              <label><input type="radio" name="custody-type" value="extended" /> Extended parenting time (NCP 110–182 nights)</label>
-              <label><input type="radio" name="custody-type" value="joint" /> Joint physical custody (NCP &ge; 183 nights)</label>
-            </div>
-          </fieldset>
-
         </div>
 
-        <!-- ── Tab 3: Deductions ───────────────────────────────── -->
-        <div class="form-section" id="tab-deductions" role="tabpanel">
-
-          <fieldset>
-            <legend>Custodial Parent Deductions</legend>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="cp-fica">FICA / Self-Employment Tax</label>
-                <div class="input-prefix"><span>$</span>
-                  <input type="number" id="cp-fica" min="0" step="1" placeholder="0" />
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="cp-federal-tax">Federal Income Tax</label>
-                <div class="input-prefix"><span>$</span>
-                  <input type="number" id="cp-federal-tax" min="0" step="1" placeholder="0" />
-                </div>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="cp-state-tax">State Income Tax</label>
-                <div class="input-prefix"><span>$</span>
-                  <input type="number" id="cp-state-tax" min="0" step="1" placeholder="0" />
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="cp-prior-support">Prior Child Support Orders <span class="optional">(other children)</span></label>
-                <div class="input-prefix"><span>$</span>
-                  <input type="number" id="cp-prior-support" min="0" step="1" placeholder="0" />
-                </div>
-              </div>
-            </div>
-          </fieldset>
-
-          <fieldset>
-            <legend>Non-Custodial Parent Deductions</legend>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="ncp-fica">FICA / Self-Employment Tax</label>
-                <div class="input-prefix"><span>$</span>
-                  <input type="number" id="ncp-fica" min="0" step="1" placeholder="0" />
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="ncp-federal-tax">Federal Income Tax</label>
-                <div class="input-prefix"><span>$</span>
-                  <input type="number" id="ncp-federal-tax" min="0" step="1" placeholder="0" />
-                </div>
-              </div>
-            </div>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="ncp-state-tax">State Income Tax</label>
-                <div class="input-prefix"><span>$</span>
-                  <input type="number" id="ncp-state-tax" min="0" step="1" placeholder="0" />
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="ncp-prior-support">Prior Child Support Orders <span class="optional">(other children)</span></label>
-                <div class="input-prefix"><span>$</span>
-                  <input type="number" id="ncp-prior-support" min="0" step="1" placeholder="0" />
-                </div>
-              </div>
-            </div>
-          </fieldset>
-
-        </div>
-
-        <!-- ── Tab 4: Additional Expenses ─────────────────────── -->
-        <div class="form-section" id="tab-expenses" role="tabpanel">
-
-          <fieldset>
-            <legend>Health Insurance</legend>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="health-cost">Monthly Premium Cost <span class="optional">(children only)</span></label>
-                <div class="input-prefix"><span>$</span>
-                  <input type="number" id="health-cost" min="0" step="1" placeholder="0" />
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="health-payer">Paid By</label>
-                <select id="health-payer">
-                  <option value="cp">Custodial Parent</option>
-                  <option value="ncp">Non-Custodial Parent</option>
-                  <option value="split">Split Proportionally</option>
-                </select>
-              </div>
-            </div>
-          </fieldset>
-
-          <fieldset>
-            <legend>Child Care</legend>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="childcare-cost">Monthly Child Care Cost</label>
-                <div class="input-prefix"><span>$</span>
-                  <input type="number" id="childcare-cost" min="0" step="1" placeholder="0" />
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="childcare-tax-credit">Federal Tax Credit Adjustment <span class="optional">(optional)</span></label>
-                <div class="input-prefix"><span>$</span>
-                  <input type="number" id="childcare-tax-credit" min="0" step="1" placeholder="0" />
-                </div>
-              </div>
-            </div>
-          </fieldset>
-
-          <fieldset>
-            <legend>Extraordinary Expenses <span class="optional" style="text-transform:none;font-size:.8rem;font-weight:400">(Neb. Ct. R. § 4-210)</span></legend>
-            <div class="form-row">
-              <div class="form-group">
-                <label for="extraordinary-cp">CP Monthly Extraordinary Expenses</label>
-                <div class="input-prefix"><span>$</span>
-                  <input type="number" id="extraordinary-cp" min="0" step="1" placeholder="0" />
-                </div>
-              </div>
-              <div class="form-group">
-                <label for="extraordinary-ncp">NCP Monthly Extraordinary Expenses</label>
-                <div class="input-prefix"><span>$</span>
-                  <input type="number" id="extraordinary-ncp" min="0" step="1" placeholder="0" />
-                </div>
-              </div>
-            </div>
-          </fieldset>
-
-          <!-- Calculate button -->
-          <div class="btn-group">
-            <button class="btn btn-primary" id="btn-calculate" type="button">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <polyline points="20 6 9 17 4 12"/>
-              </svg>
-              Calculate Support
-            </button>
-            <button class="btn btn-outline btn-sm" id="btn-reset" type="button">Reset</button>
-          </div>
-
-        </div><!-- /tab-expenses -->
-
-      </div><!-- /card-body -->
-    </section>
-
-    <!-- ── Right sidebar ──────────────────────────────────────── -->
-    <aside class="sidebar">
-
-      <!-- Results card -->
-      <div class="card" id="results-card">
-        <div class="card-header">
-          <svg class="card-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-          </svg>
-          <h2>Estimated Support</h2>
-        </div>
-        <div class="card-body">
-          <!-- Placeholder shown before calculation -->
-          <div class="result-placeholder" id="result-placeholder">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/>
-              <line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/>
+        <!-- ── Section 1: Income ─────────────────────────────── -->
+        <section class="card" aria-labelledby="income-heading">
+          <div class="card-header">
+            <svg class="card-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
             </svg>
-            Complete all sections and click <strong>Calculate Support</strong> to see the estimated monthly obligation.
+            <h2 id="income-heading">Section 1 &mdash; Monthly Income &amp; Deductions</h2>
           </div>
+          <div class="card-body">
+            <form>
+              <div class="two-col-parents">
 
-          <!-- Results shown after calculation -->
-          <div id="result-output" class="hidden">
-            <div class="result-amount">
-              <div class="label">Monthly Obligation</div>
-              <div class="amount" id="result-amount-value">$0</div>
-              <div class="period">Per Month &mdash; Paid by NCP</div>
+                <!-- 1st Parent -->
+                <div class="parent-col">
+                  <fieldset>
+                    <legend>1st Parent</legend>
+                    <div class="form-group">
+                      <label for="mother-income">
+                        Monthly Income
+                        <span class="help-icon" data-help-text="Enter the total monthly gross income from all sources." tabindex="0">?</span>
+                      </label>
+                      <div class="input-prefix">
+                        <span>$</span>
+                        <input type="number" id="mother-income" name="mother-income" min="0" step="0.01" placeholder="0.00" aria-label="1st Parent's monthly income" />
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="mother-deductions">
+                        Total Monthly Deductions
+                        <span class="help-icon" data-help-text="Use the Deduction Calculator in the sidebar for help calculating total deductions." tabindex="0">?</span>
+                      </label>
+                      <div class="input-prefix">
+                        <span>$</span>
+                        <input type="number" id="mother-deductions" name="mother-deductions" min="0" step="0.01" placeholder="0.00" aria-label="1st Parent's total deductions" />
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="mother-net-income">Monthly Net Income</label>
+                      <div id="mother-net-income-container" class="computed-field-wrap">
+                        <span class="close-icon" id="mother-net-income-warning" aria-hidden="true"></span>
+                        <input type="number" id="mother-net-income" name="mother-net-income" class="computed-field" readonly aria-label="1st Parent's monthly net income" placeholder="—" />
+                      </div>
+                    </div>
+                  </fieldset>
+                </div>
+
+                <!-- 2nd Parent -->
+                <div class="parent-col">
+                  <fieldset>
+                    <legend>2nd Parent</legend>
+                    <div class="form-group">
+                      <label for="father-income">
+                        Monthly Income
+                        <span class="help-icon" data-help-text="Enter the total monthly gross income from all sources." tabindex="0">?</span>
+                      </label>
+                      <div class="input-prefix">
+                        <span>$</span>
+                        <input type="number" id="father-income" name="father-income" min="0" step="0.01" placeholder="0.00" aria-label="2nd Parent's monthly income" />
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="father-deductions">
+                        Total Monthly Deductions
+                        <span class="help-icon" data-help-text="Use the Deduction Calculator in the sidebar for help calculating total deductions." tabindex="0">?</span>
+                      </label>
+                      <div class="input-prefix">
+                        <span>$</span>
+                        <input type="number" id="father-deductions" name="father-deductions" min="0" step="0.01" placeholder="0.00" aria-label="2nd Parent's total deductions" />
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="father-net-income">Monthly Net Income</label>
+                      <div id="father-net-income-container" class="computed-field-wrap">
+                        <span class="close-icon" id="father-net-income-warning" aria-hidden="true"></span>
+                        <input type="number" id="father-net-income" name="father-net-income" class="computed-field" readonly aria-label="2nd Parent's monthly net income" placeholder="—" />
+                      </div>
+                    </div>
+                  </fieldset>
+                </div>
+
+              </div><!-- /two-col-parents -->
+            </form>
+
+            <!-- Combined income display -->
+            <div class="combined-row">
+              <div class="combined-item">
+                <label for="combined-net-income">Combined Monthly Net Income:</label>
+                <div id="combined-net-income" class="computed-display" aria-live="polite"></div>
+              </div>
+              <div class="combined-item">
+                <label for="combined-annual-net-income">Combined Annual Net Income:</label>
+                <div id="combined-annual-net-income" class="computed-display" aria-live="polite"></div>
+              </div>
             </div>
-            <ul class="result-breakdown" id="result-breakdown">
+          </div>
+        </section>
+
+        <!-- ── Section 2: Percentage Contribution ───────────── -->
+        <section class="card" aria-labelledby="pct-heading">
+          <div class="card-header">
+            <svg class="card-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="9" cy="9" r="3"/><circle cx="15" cy="15" r="3"/>
+              <line x1="5" y1="19" x2="19" y2="5"/>
+            </svg>
+            <h2 id="pct-heading">Section 2 &mdash; Percentage Contribution</h2>
+          </div>
+          <div class="card-body">
+            <div class="two-col-parents">
+              <div class="parent-col">
+                <fieldset>
+                  <legend>1st Parent</legend>
+                  <div class="form-group">
+                    <label for="mother-percentage-contribution">
+                      Percentage Contribution
+                      <span class="help-icon" data-help-text="The calculated share of the 1st Parent's contribution to combined net income." tabindex="0">?</span>
+                    </label>
+                    <div id="mother-percentage-contribution" class="computed-display computed-display--pct" aria-live="polite"></div>
+                  </div>
+                </fieldset>
+              </div>
+              <div class="parent-col">
+                <fieldset>
+                  <legend>2nd Parent</legend>
+                  <div class="form-group">
+                    <label for="father-percentage-contribution">
+                      Percentage Contribution
+                      <span class="help-icon" data-help-text="The calculated share of the 2nd Parent's contribution to combined net income." tabindex="0">?</span>
+                    </label>
+                    <div id="father-percentage-contribution" class="computed-display computed-display--pct" aria-live="polite"></div>
+                  </div>
+                </fieldset>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Section 3: Table 1 Support Amount ────────────── -->
+        <section class="card" aria-labelledby="table1-heading">
+          <div class="card-header">
+            <svg class="card-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/>
+              <line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/>
+            </svg>
+            <h2 id="table1-heading">Section 3 &mdash; Monthly Support From Table 1</h2>
+          </div>
+          <div class="card-body">
+            <div class="form-group mb-0">
+              <label for="monthly-support-from-table-1">
+                Monthly Support From Table 1
+                <span class="help-icon" data-help-text="If you do not have this amount, use the Table 1 Calculator in the right sidebar." tabindex="0">?</span>
+              </label>
+              <div class="input-prefix input-prefix--wide">
+                <span>$</span>
+                <input type="number" id="monthly-support-from-table-1" name="monthly-support-from-table-1" min="0" step="0.01" placeholder="0.00" />
+              </div>
+              <p class="form-hint">Use the <strong>Table 1 Calculator</strong> in the right sidebar if you need to look up this amount.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Section 4: Health Insurance / Medical ─────────── -->
+        <section class="card" aria-labelledby="health-heading">
+          <div class="card-header">
+            <svg class="card-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+            </svg>
+            <h2 id="health-heading">Section 4 &mdash; Health Insurance &amp; Medical Support</h2>
+          </div>
+          <div class="card-body">
+            <form>
+              <div class="two-col-parents">
+                <div class="parent-col">
+                  <fieldset>
+                    <legend>1st Parent</legend>
+                    <div class="form-group">
+                      <label for="mother-paid-health-insurance-premium">
+                        Paid Health Insurance Premium or Cash Medical Support As Ordered
+                        <span class="help-icon" data-help-text="The amount paid for children's health insurance premium, or the cash medical support amount as ordered by the court." tabindex="0">?</span>
+                      </label>
+                      <div class="input-prefix">
+                        <span>$</span>
+                        <input type="number" id="mother-paid-health-insurance-premium" name="mother-paid-health-insurance-premium" min="0" step="0.01" placeholder="0.00" aria-label="1st Parent's paid health insurance premium" />
+                      </div>
+                      <div id="mother-paid-health-insurance-premium-warning" class="warning-message-container" aria-live="polite"></div>
+                    </div>
+                  </fieldset>
+                </div>
+                <div class="parent-col">
+                  <fieldset>
+                    <legend>2nd Parent</legend>
+                    <div class="form-group">
+                      <label for="father-paid-health-insurance-premium">
+                        Paid Health Insurance Premium or Cash Medical Support As Ordered
+                        <span class="help-icon" data-help-text="The amount paid for children's health insurance premium, or the cash medical support amount as ordered by the court." tabindex="0">?</span>
+                      </label>
+                      <div class="input-prefix">
+                        <span>$</span>
+                        <input type="number" id="father-paid-health-insurance-premium" name="father-paid-health-insurance-premium" min="0" step="0.01" placeholder="0.00" aria-label="2nd Parent's paid health insurance premium" />
+                      </div>
+                      <div id="father-paid-health-insurance-premium-warning" class="warning-message-container" aria-live="polite"></div>
+                    </div>
+                  </fieldset>
+                </div>
+              </div>
+            </form>
+
+            <!-- Total obligation display -->
+            <div class="total-obligation-row">
+              <label>Total Obligation:</label>
+              <div id="total-obligation" class="computed-display computed-display--total" aria-live="polite"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Section 5: Monthly Share, Credits, Nights ──────── -->
+        <section class="card" aria-labelledby="share-heading">
+          <div class="card-header">
+            <svg class="card-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+              <circle cx="9" cy="7" r="4"/>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+            </svg>
+            <h2 id="share-heading">Section 5 &mdash; Monthly Share, Credits &amp; Parenting Time</h2>
+          </div>
+          <div class="card-body">
+            <form>
+              <div class="two-col-parents">
+
+                <!-- 1st Parent -->
+                <div class="parent-col">
+                  <fieldset>
+                    <legend>1st Parent</legend>
+                    <div class="form-group">
+                      <label>
+                        Monthly Share
+                        <span class="help-icon" data-help-text="The 1st Parent's share of the total obligation based on percentage contribution." tabindex="0">?</span>
+                      </label>
+                      <div id="mother-monthly-share" class="computed-display" aria-live="polite"></div>
+                    </div>
+                    <div class="form-group">
+                      <label for="mother-credit-for-health-insurance-premium-paid">
+                        Credit for Health Insurance Premium Paid
+                        <span class="help-icon" data-help-text="Credit amount for health insurance premiums paid by this parent." tabindex="0">?</span>
+                      </label>
+                      <div class="input-prefix">
+                        <span>$</span>
+                        <input type="number" id="mother-credit-for-health-insurance-premium-paid" name="mother-credit-for-health-insurance-premium-paid" min="0" step="0.01" placeholder="0.00" aria-label="1st Parent's credit for health insurance premium paid" />
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="mother-time-split">
+                        Percent of Nights with 1st Parent
+                        <span class="help-icon" data-help-text="Percentage of overnights spent with the 1st parent. Must total 100% with the 2nd parent." tabindex="0">?</span>
+                      </label>
+                      <div class="input-prefix">
+                        <span>%</span>
+                        <input type="number" id="mother-time-split" name="mother-percentage-time-with-children" min="0" max="100" step="0.1" placeholder="0.0" aria-label="Percent of nights with 1st Parent" />
+                      </div>
+                    </div>
+                  </fieldset>
+                </div>
+
+                <!-- 2nd Parent -->
+                <div class="parent-col">
+                  <fieldset>
+                    <legend>2nd Parent</legend>
+                    <div class="form-group">
+                      <label>
+                        Monthly Share
+                        <span class="help-icon" data-help-text="The 2nd Parent's share of the total obligation based on percentage contribution." tabindex="0">?</span>
+                      </label>
+                      <div id="father-monthly-share" class="computed-display" aria-live="polite"></div>
+                    </div>
+                    <div class="form-group">
+                      <label for="father-credit-for-health-insurance-premium-paid">
+                        Credit for Health Insurance Premium Paid
+                        <span class="help-icon" data-help-text="Credit amount for health insurance premiums paid by this parent." tabindex="0">?</span>
+                      </label>
+                      <div class="input-prefix">
+                        <span>$</span>
+                        <input type="number" id="father-credit-for-health-insurance-premium-paid" name="father-credit-for-health-insurance-premium-paid" min="0" step="0.01" placeholder="0.00" aria-label="2nd Parent's credit for health insurance premium paid" />
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label for="father-time-split">
+                        Percent of Nights with 2nd Parent
+                        <span class="help-icon" data-help-text="Percentage of overnights spent with the 2nd parent. Must total 100% with the 1st parent." tabindex="0">?</span>
+                      </label>
+                      <div class="input-prefix">
+                        <span>%</span>
+                        <input type="number" id="father-time-split" name="father-percentage-time-with-children" min="0" max="100" step="0.1" placeholder="0.0" aria-label="Percent of nights with 2nd Parent" />
+                      </div>
+                    </div>
+                  </fieldset>
+                </div>
+
+              </div><!-- /two-col-parents -->
+
+              <!-- Calculation type + finalize -->
+              <div class="finalize-row">
+                <div class="form-group mb-0">
+                  <label for="calc-type">Calculation Type:</label>
+                  <select id="calc-type" name="calc-type">
+                    <option value="" selected disabled>Please Select A Value</option>
+                    <option value="joint-calc">Joint Physical Custody Calculation</option>
+                    <option value="basic-calc">Basic Net Income Calculation (Worksheet 1)</option>
+                  </select>
+                </div>
+                <button id="finalize-calculation" class="btn btn-primary btn-lg" type="button">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polyline points="20 6 9 17 4 12"/>
+                  </svg>
+                  Finalize Calculation
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <!-- ── Results section ───────────────────────────────── -->
+        <div class="calc-divider" aria-hidden="true"></div>
+
+        <section class="card results-card" aria-labelledby="results-heading">
+          <div class="card-header card-header--results">
+            <svg class="card-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+            <h2 id="results-heading">Calculation Results</h2>
+          </div>
+          <div class="card-body">
+            <div class="two-col-parents">
+              <div class="parent-col">
+                <fieldset class="results-fieldset">
+                  <legend>1st Parent</legend>
+                  <div class="form-group mb-0">
+                    <label class="results-label">1st Parent Owes:</label>
+                    <div id="mother-child-support" class="result-owed" aria-live="polite"></div>
+                  </div>
+                </fieldset>
+              </div>
+              <div class="parent-col">
+                <fieldset class="results-fieldset">
+                  <legend>2nd Parent</legend>
+                  <div class="form-group mb-0">
+                    <label class="results-label">2nd Parent Owes:</label>
+                    <div id="father-child-support" class="result-owed" aria-live="polite"></div>
+                  </div>
+                </fieldset>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Calculation messages -->
+        <div class="card">
+          <div class="card-body">
+            <label>Messages about the calculation:</label>
+            <div id="calculation-messages" class="calc-messages" aria-live="polite"></div>
+          </div>
+        </div>
+
+      </main><!-- /main-content -->
+
+      <!-- ════════════════════════════════════════════════════════
+           RIGHT SIDEBAR
+           ════════════════════════════════════════════════════════ -->
+      <aside class="right-sidebar" aria-label="Calculator tools">
+
+        <!-- Table 1 tool -->
+        <div class="card sidebar-card">
+          <div class="card-header">
+            <svg class="card-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/>
+              <line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/>
+            </svg>
+            <h2>Table 1 Calculator</h2>
+          </div>
+          <div class="card-body">
+            <form>
+              <div class="form-group">
+                <label for="monthly-income">Combined Monthly Net Income:</label>
+                <div class="input-prefix">
+                  <span>$</span>
+                  <input type="number" id="monthly-income" name="monthly-income" min="0" step="0.01" placeholder="0.00" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="num-children">Number of Children:</label>
+                <select id="num-children" name="num-children">
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                  <option value="6">6</option>
+                </select>
+              </div>
+              <button id="calculate-support" class="btn btn-primary btn-block" type="button">Calculate Support</button>
+              <div class="form-group mt-12">
+                <label>Calculated Support Amount:</label>
+                <div class="computed-display" id="support-amount" aria-live="polite"></div>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- Deduction calculator accordion -->
+        <div class="card sidebar-card">
+          <div class="card-body">
+            <button class="accordion-toggle" type="button" aria-expanded="false" aria-controls="deduction-calc-body">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+              Deduction Calculator
+            </button>
+            <div class="accordion-body" id="deduction-calc-body" hidden>
+              <p class="form-hint mt-8">Use this tool if you are unsure of total deductions. Fill in applicable amounts and copy the total.
+                <span class="help-icon" data-help-text="Complete the fields below to calculate total deductions for a parent." tabindex="0">?</span>
+              </p>
+              <div class="form-group">
+                <label for="taxes">Federal &amp; State Taxes:</label>
+                <div class="input-prefix"><span>$</span>
+                  <input type="number" id="taxes" name="taxes" min="0" step="0.01" placeholder="0.00" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="fica">FICA:</label>
+                <div class="input-prefix"><span>$</span>
+                  <input type="number" id="fica" name="fica" min="0" step="0.01" placeholder="0.00" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="retirement">Retirement:</label>
+                <div class="input-prefix"><span>$</span>
+                  <input type="number" id="retirement" name="retirement" min="0" step="0.01" placeholder="0.00" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="child-support-previously-ordered">Child Support Previously Ordered (other children):</label>
+                <div class="input-prefix"><span>$</span>
+                  <input type="number" id="child-support-previously-ordered" name="child-support-previously-ordered" min="0" step="0.01" placeholder="0.00" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="regular-support-for-other-children">Regular Support for Other Children:</label>
+                <div class="input-prefix"><span>$</span>
+                  <input type="number" id="regular-support-for-other-children" name="regular-support-for-other-children" min="0" step="0.01" placeholder="0.00" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="cost-to-parent-for-health-insurance">Cost to Parent for Health Insurance (self only):</label>
+                <div class="input-prefix"><span>$</span>
+                  <input type="number" id="cost-to-parent-for-health-insurance" name="cost-to-parent-for-health-insurance" min="0" step="0.01" placeholder="0.00" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="child-tax-credit">Deductions for Child Tax Credits:</label>
+                <div class="input-prefix"><span>$</span>
+                  <input type="number" id="child-tax-credit" name="child-tax-credit" min="0" step="0.01" placeholder="0.00" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="other">Other:</label>
+                <div class="input-prefix"><span>$</span>
+                  <input type="number" id="other" name="other" min="0" step="0.01" placeholder="0.00" />
+                </div>
+              </div>
+              <div class="deduction-total-row">
+                <label>Total Deductions:</label>
+                <span id="total" class="deduction-total" aria-live="polite"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Print -->
+        <div class="card sidebar-card">
+          <div class="card-body">
+            <p class="form-hint">Printable version opens in a new tab.</p>
+            <button id="print-calc" class="btn btn-outline btn-block mt-8" type="button">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="6 9 6 2 18 2 18 9"/>
+                <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                <rect x="6" y="14" width="12" height="8"/>
+              </svg>
+              Print
+            </button>
+          </div>
+        </div>
+
+        <!-- Reference material -->
+        <div class="card sidebar-card">
+          <div class="card-header">
+            <svg class="card-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+            </svg>
+            <h2>Reference Material</h2>
+          </div>
+          <div class="card-body">
+            <ul class="ref-list">
               <li>
-                <span class="item-label">Combined Net Income</span>
-                <span class="item-value" id="rb-combined">—</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                  <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+                </svg>
+                <a href="https://supremecourt.nebraska.gov/sites/default/files/worksheet1.pdf" target="_blank" rel="noopener">NE Worksheet 1</a>
               </li>
               <li>
-                <span class="item-label">Basic Support Obligation</span>
-                <span class="item-value" id="rb-basic">—</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                  <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+                </svg>
+                <a href="https://supremecourt.nebraska.gov/sites/default/files/childsup_table.pdf" target="_blank" rel="noopener">NE Table 1</a>
               </li>
               <li>
-                <span class="item-label">NCP Income Share</span>
-                <span class="item-value" id="rb-ncp-share">—</span>
-              </li>
-              <li>
-                <span class="item-label">Health Insurance Adjustment</span>
-                <span class="item-value" id="rb-health">—</span>
-              </li>
-              <li>
-                <span class="item-label">Child Care Adjustment</span>
-                <span class="item-value" id="rb-childcare">—</span>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                  <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+                </svg>
+                <a href="https://supremecourt.nebraska.gov/sites/default/files/worksheet3.pdf" target="_blank" rel="noopener">NE Worksheet 3</a>
               </li>
             </ul>
-            <div class="btn-group">
-              <button class="btn btn-outline btn-sm" id="btn-print" type="button">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
-                  <rect x="6" y="14" width="12" height="8"/>
-                </svg>
-                Print Worksheet
-              </button>
-            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Info card -->
-      <div class="card">
-        <div class="card-header">
-          <svg class="card-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
-          </svg>
-          <h2>How It Works</h2>
-        </div>
-        <div class="card-body">
-          <ul class="info-list">
-            <li>
-              <svg class="info-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-              <span>Enter each parent's gross monthly income from all sources.</span>
-            </li>
-            <li>
-              <svg class="info-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-              <span>Select custody arrangement and parenting-time overnights.</span>
-            </li>
-            <li>
-              <svg class="info-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-              <span>Deductions reduce gross income to arrive at net income per parent.</span>
-            </li>
-            <li>
-              <svg class="info-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-              <span>The Nebraska Schedule of Basic Support Obligations is applied to combined net income.</span>
-            </li>
-            <li>
-              <svg class="info-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
-              <span>Health insurance and child care expenses are allocated proportionally.</span>
-            </li>
-          </ul>
+      </aside><!-- /right-sidebar -->
 
-          <div class="statute-ref">
-            <strong>Statutory References</strong>
-            Neb. Rev. Stat. § 42-364 &mdash; Child Support<br/>
-            Neb. Ct. R. §§ 4-201 through 4-216 &mdash; Child Support Guidelines<br/>
-            <a href="https://supremecourt.nebraska.gov/self-help/child-support" target="_blank" rel="noopener">Nebraska Supreme Court &mdash; Child Support</a>
-          </div>
-        </div>
-      </div>
-
-    </aside>
-  </main>
+    </div><!-- /outer-layout -->
+  </div><!-- /page-wrapper -->
 
   <!-- ── Footer ───────────────────────────────────────────────── -->
   <footer class="site-footer">
@@ -408,6 +609,14 @@
        <a href="https://supremecourt.nebraska.gov/" target="_blank" rel="noopener">Nebraska Supreme Court</a></p>
   </footer>
 
-  <script src="js/calculator.js" defer></script>
+  <!-- Hidden alert-shown flags (used by calculation JS) -->
+  <div id="motherinsalertShown" style="display:none;"></div>
+  <div id="fatherinsalertShown" style="display:none;"></div>
+
+  <!-- Tooltip element -->
+  <div id="help-tooltip" class="help-tooltip" role="tooltip" aria-hidden="true"></div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="js/calculator.js"></script>
 </body>
 </html>

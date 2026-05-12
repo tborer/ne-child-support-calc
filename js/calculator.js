@@ -1,63 +1,170 @@
-// Tab navigation
-document.querySelectorAll('.section-tab').forEach(tab => {
-  tab.addEventListener('click', () => {
-    const target = tab.dataset.tab;
-    document.querySelectorAll('.section-tab').forEach(t => {
-      t.classList.remove('active');
-      t.setAttribute('aria-selected', 'false');
-    });
-    document.querySelectorAll('.form-section').forEach(s => s.classList.remove('active'));
-    tab.classList.add('active');
-    tab.setAttribute('aria-selected', 'true');
-    document.getElementById('tab-' + target).classList.add('active');
+$(function () {
+
+  // ── Help icon tooltips ────────────────────────────────────────
+  var $tooltip = $('#help-tooltip');
+
+  $(document).on('mouseenter focus', '.help-icon', function (e) {
+    var text = $(this).data('help-text');
+    if (!text) return;
+    $tooltip.text(text).addClass('visible').attr('aria-hidden', 'false');
+    positionTooltip(e);
+  }).on('mousemove', '.help-icon', function (e) {
+    positionTooltip(e);
+  }).on('mouseleave blur', '.help-icon', function () {
+    $tooltip.removeClass('visible').attr('aria-hidden', 'true');
   });
+
+  function positionTooltip(e) {
+    var x = e.clientX + 12;
+    var y = e.clientY + 12;
+    if (x + 250 > window.innerWidth) x = e.clientX - 260;
+    $tooltip.css({ left: x, top: y });
+  }
+
+  // ── Accordion ─────────────────────────────────────────────────
+  $('.accordion-toggle').on('click', function () {
+    var $btn = $(this);
+    var expanded = $btn.attr('aria-expanded') === 'true';
+    var $body = $('#' + $btn.attr('aria-controls'));
+    $btn.attr('aria-expanded', !expanded);
+    if (expanded) {
+      $body.prop('hidden', true);
+    } else {
+      $body.prop('hidden', false);
+    }
+  });
+
+  // ── Net income auto-calculation ───────────────────────────────
+  function updateNetIncome(incomeId, deductionsId, netId, warningId, wrapId) {
+    var income = parseFloat($('#' + incomeId).val()) || 0;
+    var deductions = parseFloat($('#' + deductionsId).val()) || 0;
+    var net = income - deductions;
+    var $netInput = $('#' + netId);
+    var $warn = $('#' + warningId);
+
+    $netInput.val(net !== 0 ? net.toFixed(2) : '');
+
+    if (net < 0) {
+      $warn.text('⚠ Deductions exceed income');
+      $netInput.css('color', 'var(--danger)');
+    } else {
+      $warn.text('');
+      $netInput.css('color', '');
+    }
+
+    updateCombined();
+  }
+
+  $('#mother-income, #mother-deductions').on('input', function () {
+    updateNetIncome('mother-income', 'mother-deductions', 'mother-net-income', 'mother-net-income-warning', 'mother-net-income-container');
+  });
+
+  $('#father-income, #father-deductions').on('input', function () {
+    updateNetIncome('father-income', 'father-deductions', 'father-net-income', 'father-net-income-warning', 'father-net-income-container');
+  });
+
+  // ── Combined income & percentages ─────────────────────────────
+  function fmt(n) {
+    return '$' + Math.abs(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  }
+
+  function updateCombined() {
+    var motherNet = parseFloat($('#mother-net-income').val()) || 0;
+    var fatherNet = parseFloat($('#father-net-income').val()) || 0;
+    var combined  = motherNet + fatherNet;
+    var annual    = combined * 12;
+
+    $('#combined-net-income').text(combined !== 0 ? fmt(combined) : '');
+    $('#combined-annual-net-income').text(annual !== 0 ? fmt(annual) : '');
+
+    if (combined > 0) {
+      var motherPct = (motherNet / combined * 100).toFixed(2);
+      var fatherPct = (fatherNet / combined * 100).toFixed(2);
+      $('#mother-percentage-contribution').text(motherPct + '%');
+      $('#father-percentage-contribution').text(fatherPct + '%');
+    } else {
+      $('#mother-percentage-contribution, #father-percentage-contribution').text('');
+    }
+
+    updateTotalObligation();
+  }
+
+  // ── Total obligation ──────────────────────────────────────────
+  function updateTotalObligation() {
+    var table1   = parseFloat($('#monthly-support-from-table-1').val()) || 0;
+    var motherIns = parseFloat($('#mother-paid-health-insurance-premium').val()) || 0;
+    var fatherIns = parseFloat($('#father-paid-health-insurance-premium').val()) || 0;
+    var total = table1 + motherIns + fatherIns;
+
+    $('#total-obligation').text(total > 0 ? fmt(total) : '');
+
+    updateMonthlyShares(total);
+  }
+
+  $('#monthly-support-from-table-1, #mother-paid-health-insurance-premium, #father-paid-health-insurance-premium').on('input', updateTotalObligation);
+
+  // ── Monthly shares ────────────────────────────────────────────
+  function updateMonthlyShares(total) {
+    if (total === undefined) total = parseFloat($('#total-obligation').text().replace(/[^0-9.]/g, '')) || 0;
+    var motherNet = parseFloat($('#mother-net-income').val()) || 0;
+    var fatherNet = parseFloat($('#father-net-income').val()) || 0;
+    var combined  = motherNet + fatherNet;
+
+    if (combined > 0 && total > 0) {
+      var motherShare = total * (motherNet / combined);
+      var fatherShare = total * (fatherNet / combined);
+      $('#mother-monthly-share').text(fmt(motherShare));
+      $('#father-monthly-share').text(fmt(fatherShare));
+    } else {
+      $('#mother-monthly-share, #father-monthly-share').text('');
+    }
+  }
+
+  // ── Deduction calculator ──────────────────────────────────────
+  var $deductionInputs = $('#taxes, #fica, #retirement, #child-support-previously-ordered, #regular-support-for-other-children, #cost-to-parent-for-health-insurance, #child-tax-credit, #other');
+
+  $deductionInputs.on('input', function () {
+    var total = 0;
+    $deductionInputs.each(function () {
+      total += parseFloat($(this).val()) || 0;
+    });
+    $('#total').text(total > 0 ? fmt(total) : '');
+  });
+
+  // ── Table 1 sidebar calculator ────────────────────────────────
+  // Placeholder — will be replaced with real Nebraska Table 1 data
+  $('#calculate-support').on('click', function () {
+    var income   = parseFloat($('#monthly-income').val()) || 0;
+    var children = parseInt($('#num-children').val()) || 1;
+
+    if (income <= 0) {
+      alert('Please enter a combined monthly net income amount.');
+      return;
+    }
+
+    // Stub: real Nebraska Table 1 lookup goes here
+    var amount = 0;
+    $('#support-amount').text(amount > 0 ? fmt(amount) : 'See NE Table 1');
+  });
+
+  // ── Finalize calculation ──────────────────────────────────────
+  // Stub entry point — replace body with real joint/basic calc logic
+  $('#finalize-calculation').on('click', function () {
+    var calcType = $('#calc-type').val();
+    if (!calcType) {
+      alert('Please select a Calculation Type before finalizing.');
+      return;
+    }
+
+    // Real calculation logic will go here
+    $('#mother-child-support').text('');
+    $('#father-child-support').text('');
+    $('#calculation-messages').text('Calculation type selected: ' + calcType + '. Calculation logic pending.');
+  });
+
+  // ── Print ─────────────────────────────────────────────────────
+  $('#print-calc').on('click', function () {
+    window.print();
+  });
+
 });
-
-// Reset
-document.getElementById('btn-reset').addEventListener('click', () => {
-  document.querySelectorAll('input[type="number"]').forEach(i => { i.value = ''; });
-  document.querySelectorAll('input[type="radio"]').forEach(r => { r.checked = r.defaultChecked; });
-  document.querySelectorAll('select').forEach(s => { s.selectedIndex = 0; });
-  document.getElementById('result-placeholder').classList.remove('hidden');
-  document.getElementById('result-output').classList.add('hidden');
-});
-
-// Print
-document.getElementById('btn-print').addEventListener('click', () => window.print());
-
-// Calculate — placeholder logic; replace with real guidelines schedule
-document.getElementById('btn-calculate').addEventListener('click', () => {
-  const val = id => parseFloat(document.getElementById(id).value) || 0;
-
-  const cpGross = val('cp-gross-income');
-  const ncpGross = val('ncp-gross-income');
-
-  const cpNet = cpGross - val('cp-fica') - val('cp-federal-tax') - val('cp-state-tax') - val('cp-prior-support');
-  const ncpNet = ncpGross - val('ncp-fica') - val('ncp-federal-tax') - val('ncp-state-tax') - val('ncp-prior-support');
-  const combined = Math.max(cpNet, 0) + Math.max(ncpNet, 0);
-
-  if (combined <= 0) { alert('Please enter income information first.'); return; }
-
-  const ncpShare = combined > 0 ? Math.max(ncpNet, 0) / combined : 0;
-
-  // Placeholder basic support lookup — will be replaced by real schedule
-  const basicSupport = combined * 0.20;
-  const healthAdj = val('health-cost') * ncpShare;
-  const childcareAdj = (val('childcare-cost') - val('childcare-tax-credit')) * ncpShare;
-
-  const total = basicSupport * ncpShare + healthAdj + childcareAdj;
-
-  const fmt = n => '$' + Math.max(n, 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-
-  document.getElementById('result-amount-value').textContent = fmt(total);
-  document.getElementById('rb-combined').textContent = fmt(combined);
-  document.getElementById('rb-basic').textContent = fmt(basicSupport);
-  document.getElementById('rb-ncp-share').textContent = (ncpShare * 100).toFixed(1) + '%';
-  document.getElementById('rb-health').textContent = fmt(healthAdj);
-  document.getElementById('rb-childcare').textContent = fmt(childcareAdj);
-
-  document.getElementById('result-placeholder').classList.add('hidden');
-  document.getElementById('result-output').classList.remove('hidden');
-});
-
-function id(s) { return document.getElementById(s); }
