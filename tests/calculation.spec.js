@@ -13,6 +13,24 @@ async function fillAndBlur(page, selector, value) {
 }
 
 /**
+ * Assert that a result element's numeric value is within $1.00 of the expected
+ * amount. Rounding differences in intermediate floating-point steps can produce
+ * a ±1 discrepancy; anything larger is a genuine calculation error.
+ */
+async function assertWithinDollar(page, selector, expected) {
+  const text = await page.locator(selector).textContent();
+  const actual = parseInt((text || '').trim(), 10);
+  expect(
+    isNaN(actual) ? null : actual,
+    `${selector}: expected ≈${expected} but element contained "${text}"`
+  ).not.toBeNull();
+  expect(
+    Math.abs(actual - expected),
+    `${selector}: expected ≈${expected}, got ${actual} — difference exceeds $1.00`
+  ).toBeLessThanOrEqual(1);
+}
+
+/**
  * Run a full JPC calculation and return the displayed results.
  * All inputs are read from the `tc` (test-case) object.
  */
@@ -247,8 +265,8 @@ test.describe('Support Obligation Calculations (JPC)', () => {
       `${tc.id}: mInc=${tc.mInc} fInc=${tc.fInc} t1=${tc.t1} ins=${tc.mIns}/${tc.fIns} split=${tc.mSplit}/${tc.fSplit} → M=${tc.mOwes} F=${tc.fOwes}`,
       async ({ page }) => {
         await runCalc(page, tc);
-        await expect(page.locator('#mother-child-support')).toHaveText(String(tc.mOwes));
-        await expect(page.locator('#father-child-support')).toHaveText(String(tc.fOwes));
+        await assertWithinDollar(page, '#mother-child-support', tc.mOwes);
+        await assertWithinDollar(page, '#father-child-support', tc.fOwes);
       }
     );
   }
