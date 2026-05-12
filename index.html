@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nebraska Child Support Calculator</title>
+  <meta name="description" content="Calculate child support obligations under Nebraska Revised Statute § 42-364 and the Nebraska Child Support Guidelines." />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+
+  <!-- ── Header ───────────────────────────────────────────────── -->
+  <header class="site-header">
+    <div class="header-inner">
+      <!-- Nebraska state seal placeholder (inline SVG) -->
+      <svg class="header-seal" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="26" cy="26" r="25" fill="#243460" stroke="#b8952a" stroke-width="2"/>
+        <circle cx="26" cy="26" r="20" fill="none" stroke="#b8952a" stroke-width="1" stroke-dasharray="3 2"/>
+        <text x="26" y="21" text-anchor="middle" fill="#d4af4f" font-size="7" font-family="Georgia,serif" font-weight="bold">GREAT SEAL</text>
+        <text x="26" y="30" text-anchor="middle" fill="#d4af4f" font-size="6" font-family="Georgia,serif">NEBRASKA</text>
+        <text x="26" y="38" text-anchor="middle" fill="#d4af4f" font-size="5" font-family="Georgia,serif">EST. 1867</text>
+      </svg>
+      <div class="header-titles">
+        <h1>Nebraska Child Support Calculator</h1>
+        <p>Nebraska Child Support Guidelines &mdash; Neb. Rev. Stat. &sect;&nbsp;42-364</p>
+      </div>
+    </div>
+    <div class="header-rule"></div>
+  </header>
+
+  <!-- ── Navigation ───────────────────────────────────────────── -->
+  <nav class="site-nav" aria-label="Primary navigation">
+    <div class="nav-inner">
+      <a href="#" class="active">Calculator</a>
+      <a href="#">Guidelines</a>
+      <a href="#">Worksheets</a>
+      <a href="#">Resources</a>
+    </div>
+  </nav>
+
+  <!-- ── Main content ──────────────────────────────────────────── -->
+  <main class="site-main">
+
+    <!-- Disclaimer -->
+    <div class="disclaimer" role="note">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b8952a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r=".5" fill="#b8952a"/>
+      </svg>
+      <span>
+        <strong>Informational use only.</strong> This tool estimates child support based on Nebraska Child Support Guidelines.
+        Results are not legal advice. Consult a licensed Nebraska attorney for guidance on your specific situation.
+        Final orders are determined by the court.
+      </span>
+    </div>
+
+    <!-- ── Calculator card ────────────────────────────────────── -->
+    <section class="card" aria-labelledby="calc-heading">
+      <div class="card-header">
+        <svg class="card-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/>
+          <line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/>
+        </svg>
+        <h2 id="calc-heading">Child Support Worksheet</h2>
+      </div>
+      <div class="card-body">
+
+        <!-- Section tabs -->
+        <div class="section-tabs" role="tablist">
+          <button class="section-tab active" role="tab" aria-selected="true"  data-tab="income">1 &mdash; Income</button>
+          <button class="section-tab"         role="tab" aria-selected="false" data-tab="custody">2 &mdash; Custody</button>
+          <button class="section-tab"         role="tab" aria-selected="false" data-tab="deductions">3 &mdash; Deductions</button>
+          <button class="section-tab"         role="tab" aria-selected="false" data-tab="expenses">4 &mdash; Expenses</button>
+        </div>
+
+        <!-- ── Tab 1: Income ───────────────────────────────────── -->
+        <div class="form-section active" id="tab-income" role="tabpanel">
+
+          <fieldset>
+            <legend>Custodial Parent (CP)</legend>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="cp-gross-income">Gross Monthly Income</label>
+                <div class="input-prefix"><span>$</span>
+                  <input type="number" id="cp-gross-income" min="0" step="1" placeholder="0" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="cp-income-type">Income Type</label>
+                <select id="cp-income-type">
+                  <option value="employment">W-2 Employment</option>
+                  <option value="self">Self-Employment</option>
+                  <option value="mixed">Mixed</option>
+                  <option value="imputed">Imputed</option>
+                </select>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Non-Custodial Parent (NCP)</legend>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="ncp-gross-income">Gross Monthly Income</label>
+                <div class="input-prefix"><span>$</span>
+                  <input type="number" id="ncp-gross-income" min="0" step="1" placeholder="0" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="ncp-income-type">Income Type</label>
+                <select id="ncp-income-type">
+                  <option value="employment">W-2 Employment</option>
+                  <option value="self">Self-Employment</option>
+                  <option value="mixed">Mixed</option>
+                  <option value="imputed">Imputed</option>
+                </select>
+              </div>
+            </div>
+          </fieldset>
+
+        </div>
+
+        <!-- ── Tab 2: Custody ──────────────────────────────────── -->
+        <div class="form-section" id="tab-custody" role="tabpanel">
+
+          <div class="form-group">
+            <label>Number of Children</label>
+            <div class="radio-group">
+              <label><input type="radio" name="num-children" value="1" checked /> 1 child</label>
+              <label><input type="radio" name="num-children" value="2" /> 2 children</label>
+              <label><input type="radio" name="num-children" value="3" /> 3 children</label>
+              <label><input type="radio" name="num-children" value="4" /> 4 or more children</label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="ncp-overnights">NCP Parenting Time <span class="optional">(overnights / year)</span></label>
+            <input type="number" id="ncp-overnights" min="0" max="365" step="1" placeholder="73" />
+            <p class="form-hint">Standard parenting plan: 73 nights (every other weekend + holidays). Enter actual number if known.</p>
+          </div>
+
+          <fieldset>
+            <legend>Custody Arrangement</legend>
+            <div class="radio-group">
+              <label><input type="radio" name="custody-type" value="sole" checked /> Sole physical custody (NCP &lt; 110 nights)</label>
+              <label><input type="radio" name="custody-type" value="extended" /> Extended parenting time (NCP 110–182 nights)</label>
+              <label><input type="radio" name="custody-type" value="joint" /> Joint physical custody (NCP &ge; 183 nights)</label>
+            </div>
+          </fieldset>
+
+        </div>
+
+        <!-- ── Tab 3: Deductions ───────────────────────────────── -->
+        <div class="form-section" id="tab-deductions" role="tabpanel">
+
+          <fieldset>
+            <legend>Custodial Parent Deductions</legend>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="cp-fica">FICA / Self-Employment Tax</label>
+                <div class="input-prefix"><span>$</span>
+                  <input type="number" id="cp-fica" min="0" step="1" placeholder="0" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="cp-federal-tax">Federal Income Tax</label>
+                <div class="input-prefix"><span>$</span>
+                  <input type="number" id="cp-federal-tax" min="0" step="1" placeholder="0" />
+                </div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="cp-state-tax">State Income Tax</label>
+                <div class="input-prefix"><span>$</span>
+                  <input type="number" id="cp-state-tax" min="0" step="1" placeholder="0" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="cp-prior-support">Prior Child Support Orders <span class="optional">(other children)</span></label>
+                <div class="input-prefix"><span>$</span>
+                  <input type="number" id="cp-prior-support" min="0" step="1" placeholder="0" />
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Non-Custodial Parent Deductions</legend>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="ncp-fica">FICA / Self-Employment Tax</label>
+                <div class="input-prefix"><span>$</span>
+                  <input type="number" id="ncp-fica" min="0" step="1" placeholder="0" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="ncp-federal-tax">Federal Income Tax</label>
+                <div class="input-prefix"><span>$</span>
+                  <input type="number" id="ncp-federal-tax" min="0" step="1" placeholder="0" />
+                </div>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="ncp-state-tax">State Income Tax</label>
+                <div class="input-prefix"><span>$</span>
+                  <input type="number" id="ncp-state-tax" min="0" step="1" placeholder="0" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="ncp-prior-support">Prior Child Support Orders <span class="optional">(other children)</span></label>
+                <div class="input-prefix"><span>$</span>
+                  <input type="number" id="ncp-prior-support" min="0" step="1" placeholder="0" />
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+        </div>
+
+        <!-- ── Tab 4: Additional Expenses ─────────────────────── -->
+        <div class="form-section" id="tab-expenses" role="tabpanel">
+
+          <fieldset>
+            <legend>Health Insurance</legend>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="health-cost">Monthly Premium Cost <span class="optional">(children only)</span></label>
+                <div class="input-prefix"><span>$</span>
+                  <input type="number" id="health-cost" min="0" step="1" placeholder="0" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="health-payer">Paid By</label>
+                <select id="health-payer">
+                  <option value="cp">Custodial Parent</option>
+                  <option value="ncp">Non-Custodial Parent</option>
+                  <option value="split">Split Proportionally</option>
+                </select>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Child Care</legend>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="childcare-cost">Monthly Child Care Cost</label>
+                <div class="input-prefix"><span>$</span>
+                  <input type="number" id="childcare-cost" min="0" step="1" placeholder="0" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="childcare-tax-credit">Federal Tax Credit Adjustment <span class="optional">(optional)</span></label>
+                <div class="input-prefix"><span>$</span>
+                  <input type="number" id="childcare-tax-credit" min="0" step="1" placeholder="0" />
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Extraordinary Expenses <span class="optional" style="text-transform:none;font-size:.8rem;font-weight:400">(Neb. Ct. R. § 4-210)</span></legend>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="extraordinary-cp">CP Monthly Extraordinary Expenses</label>
+                <div class="input-prefix"><span>$</span>
+                  <input type="number" id="extraordinary-cp" min="0" step="1" placeholder="0" />
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="extraordinary-ncp">NCP Monthly Extraordinary Expenses</label>
+                <div class="input-prefix"><span>$</span>
+                  <input type="number" id="extraordinary-ncp" min="0" step="1" placeholder="0" />
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- Calculate button -->
+          <div class="btn-group">
+            <button class="btn btn-primary" id="btn-calculate" type="button">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Calculate Support
+            </button>
+            <button class="btn btn-outline btn-sm" id="btn-reset" type="button">Reset</button>
+          </div>
+
+        </div><!-- /tab-expenses -->
+
+      </div><!-- /card-body -->
+    </section>
+
+    <!-- ── Right sidebar ──────────────────────────────────────── -->
+    <aside class="sidebar">
+
+      <!-- Results card -->
+      <div class="card" id="results-card">
+        <div class="card-header">
+          <svg class="card-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+          <h2>Estimated Support</h2>
+        </div>
+        <div class="card-body">
+          <!-- Placeholder shown before calculation -->
+          <div class="result-placeholder" id="result-placeholder">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/>
+              <line x1="8" y1="10" x2="16" y2="10"/><line x1="8" y1="14" x2="12" y2="14"/>
+            </svg>
+            Complete all sections and click <strong>Calculate Support</strong> to see the estimated monthly obligation.
+          </div>
+
+          <!-- Results shown after calculation -->
+          <div id="result-output" class="hidden">
+            <div class="result-amount">
+              <div class="label">Monthly Obligation</div>
+              <div class="amount" id="result-amount-value">$0</div>
+              <div class="period">Per Month &mdash; Paid by NCP</div>
+            </div>
+            <ul class="result-breakdown" id="result-breakdown">
+              <li>
+                <span class="item-label">Combined Net Income</span>
+                <span class="item-value" id="rb-combined">—</span>
+              </li>
+              <li>
+                <span class="item-label">Basic Support Obligation</span>
+                <span class="item-value" id="rb-basic">—</span>
+              </li>
+              <li>
+                <span class="item-label">NCP Income Share</span>
+                <span class="item-value" id="rb-ncp-share">—</span>
+              </li>
+              <li>
+                <span class="item-label">Health Insurance Adjustment</span>
+                <span class="item-value" id="rb-health">—</span>
+              </li>
+              <li>
+                <span class="item-label">Child Care Adjustment</span>
+                <span class="item-value" id="rb-childcare">—</span>
+              </li>
+            </ul>
+            <div class="btn-group">
+              <button class="btn btn-outline btn-sm" id="btn-print" type="button">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                  <rect x="6" y="14" width="12" height="8"/>
+                </svg>
+                Print Worksheet
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info card -->
+      <div class="card">
+        <div class="card-header">
+          <svg class="card-icon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          <h2>How It Works</h2>
+        </div>
+        <div class="card-body">
+          <ul class="info-list">
+            <li>
+              <svg class="info-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Enter each parent's gross monthly income from all sources.</span>
+            </li>
+            <li>
+              <svg class="info-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Select custody arrangement and parenting-time overnights.</span>
+            </li>
+            <li>
+              <svg class="info-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Deductions reduce gross income to arrive at net income per parent.</span>
+            </li>
+            <li>
+              <svg class="info-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>The Nebraska Schedule of Basic Support Obligations is applied to combined net income.</span>
+            </li>
+            <li>
+              <svg class="info-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Health insurance and child care expenses are allocated proportionally.</span>
+            </li>
+          </ul>
+
+          <div class="statute-ref">
+            <strong>Statutory References</strong>
+            Neb. Rev. Stat. § 42-364 &mdash; Child Support<br/>
+            Neb. Ct. R. §§ 4-201 through 4-216 &mdash; Child Support Guidelines<br/>
+            <a href="https://supremecourt.nebraska.gov/self-help/child-support" target="_blank" rel="noopener">Nebraska Supreme Court &mdash; Child Support</a>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+  </main>
+
+  <!-- ── Footer ───────────────────────────────────────────────── -->
+  <footer class="site-footer">
+    <p>Nebraska Child Support Calculator &mdash; Informational use only. Not legal advice.</p>
+    <hr class="footer-rule" />
+    <p>Based on Nebraska Child Support Guidelines effective 2024 &middot;
+       <a href="https://supremecourt.nebraska.gov/" target="_blank" rel="noopener">Nebraska Supreme Court</a></p>
+  </footer>
+
+  <script src="js/calculator.js" defer></script>
+</body>
+</html>
