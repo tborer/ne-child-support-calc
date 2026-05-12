@@ -21,16 +21,23 @@ let calcType = '';
 const povertyGuideline = 1255;
 
 // ── Table 1 CSV data (loaded on page init) ────────────────────────
+// Rows: [income, 1-child-amount, 2-child-amount, ..., 6-child-amount]
+// Income range: $500 – $20,000 in $50 increments (391 rows)
 let supportAmounts = [];
 
 fetch('data/ne-child-support-table-1.csv')
   .then(response => response.text())
   .then(csvData => {
     const csvRows = csvData.split('\n');
-    csvRows.forEach(row => {
-      const columns = row.split(',');
-      supportAmounts.push(columns);
+    csvRows.forEach((row, index) => {
+      if (index === 0) return; // skip header row
+      const cols = row.trim().split(',');
+      if (cols.length >= 7 && !isNaN(parseInt(cols[0]))) {
+        supportAmounts.push(cols.map(Number));
+      }
     });
+    console.log('Table 1 loaded:', supportAmounts.length, 'rows,',
+      'range $' + supportAmounts[0][0] + ' – $' + supportAmounts[supportAmounts.length - 1][0]);
   })
   .catch(error => console.error('Table 1 CSV load error:', error));
 
@@ -374,37 +381,42 @@ jQuery(document).ready(function ($) {
   });
 
   // ── Table 1 sidebar calculator ──────────────────────────────────
-  // Uses the CSV loaded at the top of this file.
-  // Place your Nebraska Table 1 CSV at: data/ne-child-support-table-1.csv
-  // Columns: Monthly Net Income, 1 child, 2 children, ... 6 children
+  // Looks up Nebraska Schedule of Basic Support Obligations (Table 1).
+  // Income is rounded to nearest $50 to match table increments.
+  // Table covers $500 – $20,000; incomes below $500 return minimum ($50).
+  // Incomes above $20,000 return the maximum table value for that child count.
   $('#calculate-support').on('click', function (event) {
     event.preventDefault();
 
     if (supportAmounts.length === 0) {
-      alert('Table 1 data is not yet loaded. Please ensure data/ne-child-support-table-1.csv exists.');
+      alert('Table 1 data is still loading. Please try again in a moment.');
       return;
     }
 
-    const monthlyIncome = Math.round(parseInt($('#monthly-income').val()) / 50) * 50;
-    const numChildren   = parseInt($('#num-children').val());
+    const rawIncome   = parseFloat($('#monthly-income').val());
+    const numChildren = parseInt($('#num-children').val());
 
-    if (isNaN(monthlyIncome) || monthlyIncome <= 0) {
+    if (isNaN(rawIncome) || rawIncome <= 0) {
       alert('Please enter a combined monthly net income amount.');
       return;
     }
 
-    const closestRow = supportAmounts.reduce((closest, current) => {
-      const currentIncome = parseInt(current[0]);
-      const diff = Math.abs(currentIncome - monthlyIncome);
-      if (diff < Math.abs(parseInt(closest[0]) - monthlyIncome)) {
-        return current;
-      }
-      return closest;
+    const TABLE_MIN = supportAmounts[0][0];
+    const TABLE_MAX = supportAmounts[supportAmounts.length - 1][0];
+
+    let lookupIncome = Math.round(rawIncome / 50) * 50;
+    lookupIncome = Math.max(TABLE_MIN, Math.min(TABLE_MAX, lookupIncome));
+
+    const closestRow = supportAmounts.reduce((best, row) => {
+      return Math.abs(row[0] - lookupIncome) < Math.abs(best[0] - lookupIncome) ? row : best;
     }, supportAmounts[0]);
 
-    const supportAmount = closestRow[numChildren];
-    if (supportAmount && supportAmount.trim() !== '') {
-      $('#support-amount').text('$' + supportAmount.trim());
+    const amount = closestRow[numChildren]; // column index matches child count (1–6)
+    if (amount !== undefined && !isNaN(amount)) {
+      $('#support-amount').text('$' + amount);
+      if (rawIncome > TABLE_MAX) {
+        $('#support-amount').append(' <small>(table max applied)</small>');
+      }
     } else {
       $('#support-amount').text('No data found');
     }
