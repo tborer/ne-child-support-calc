@@ -527,14 +527,14 @@ input.computed-field:focus {
   border-radius: var(--radius-lg);
   font-size: 16px;
   height: 25px;
-  width: 120px;
+  width: auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   color: var(--white);
   margin-top: 20px;
   margin-bottom: 20px;
-  padding: 0;
+  padding: 0 12px;
   cursor: pointer;
 }
 
@@ -546,14 +546,14 @@ input.computed-field:focus {
   border-radius: var(--radius-lg);
   font-size: 16px;
   height: 25px;
-  width: 120px;
+  width: auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   color: var(--white);
   margin-top: 20px;
   margin-bottom: 20px;
-  padding: 0;
+  padding: 0 12px;
   cursor: pointer;
   font-family: inherit;
   font-weight: normal;

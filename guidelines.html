@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculator Guidelines — Nebraska Child Support Calculator</title>
+  <meta name="description" content="Step-by-step guidelines for using the Nebraska Child Support Calculator." />
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    /* Guidelines-page specific styles */
+    .guidelines-content {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 0 0 40px;
+    }
+
+    .guidelines-intro {
+      background: var(--section-bg);
+      border: 1px solid var(--blue);
+      box-shadow: var(--shadow-section);
+      padding: 18px 20px;
+      margin-bottom: 24px;
+      font-size: .92rem;
+    }
+
+    .guidelines-intro p { margin-bottom: 0; }
+
+    .step-card {
+      background: var(--section-bg);
+      border: 1px solid var(--blue);
+      box-shadow: var(--shadow-section);
+      padding: 20px 24px;
+      margin-bottom: 16px;
+      display: grid;
+      grid-template-columns: 40px 1fr;
+      gap: 0 16px;
+    }
+
+    .step-number {
+      width: 40px;
+      height: 40px;
+      background: var(--blue);
+      color: #fff;
+      font-size: 1.1rem;
+      font-weight: bold;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .step-body h2 {
+      font-size: 1rem;
+      margin-bottom: 6px;
+      color: var(--blue-dark);
+    }
+
+    .step-body p {
+      font-size: .9rem;
+      margin-bottom: .5em;
+    }
+
+    .step-body p:last-child { margin-bottom: 0; }
+
+    .step-body ul {
+      font-size: .9rem;
+      padding-left: 18px;
+      margin-bottom: .5em;
+    }
+
+    .step-body ul li { margin-bottom: 4px; }
+
+    .step-body .tip {
+      background: #e8f0fe;
+      border-left: 3px solid var(--blue);
+      padding: 8px 12px;
+      font-size: .85rem;
+      margin-top: 8px;
+    }
+
+    .guidelines-note {
+      background: var(--section-bg);
+      border: 1px solid var(--blue);
+      padding: 14px 20px;
+      font-size: .85rem;
+      margin-top: 8px;
+    }
+
+    .guidelines-note strong { color: var(--blue-dark); }
+  </style>
+</head>
+<body>
+
+  <!-- ── Header ───────────────────────────────────────────────── -->
+  <header class="site-header">
+    <div class="header-inner">
+      <svg class="header-seal" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <circle cx="26" cy="26" r="25" fill="#243460" stroke="#b8952a" stroke-width="2"/>
+        <circle cx="26" cy="26" r="20" fill="none" stroke="#b8952a" stroke-width="1" stroke-dasharray="3 2"/>
+        <text x="26" y="30" text-anchor="middle" dominant-baseline="middle" fill="#d4af4f" font-size="7" font-family="Georgia,serif" font-weight="bold">NEBRASKA</text>
+      </svg>
+      <div class="header-titles">
+        <h1>Nebraska Child Support Calculator</h1>
+        <p>Nebraska Child Support Guidelines</p>
+      </div>
+    </div>
+    <div class="header-rule"></div>
+  </header>
+
+  <!-- ── Navigation ───────────────────────────────────────────── -->
+  <nav class="site-nav" aria-label="Primary navigation">
+    <div class="nav-inner">
+      <a href="index.html">Calculator</a>
+      <a href="guidelines.html" class="active">Guidelines</a>
+    </div>
+  </nav>
+
+  <!-- ── Page wrapper ──────────────────────────────────────────── -->
+  <div class="page-wrapper">
+    <div class="guidelines-content">
+
+      <div class="guidelines-intro">
+        <p>Follow these steps to complete a child support calculation. Work through each section of the calculator in order — the sidebar tools on the main calculator page can help with intermediate figures.</p>
+      </div>
+
+      <!-- Step 1 -->
+      <div class="step-card">
+        <div class="step-number">1</div>
+        <div class="step-body">
+          <h2>Enter a Case Name (Optional)</h2>
+          <p>Type a case name or identifier at the top of the calculator. This label will appear on any printed output and helps keep your records organized. It has no effect on the calculation.</p>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="step-card">
+        <div class="step-number">2</div>
+        <div class="step-body">
+          <h2>Enter Monthly Gross Income for Each Parent</h2>
+          <p>Under <strong>Section 1 — Income</strong>, enter the gross monthly income for the Mother and the Father in the first row of each column.</p>
+          <ul>
+            <li>Include wages, salaries, commissions, bonuses, self-employment income, rental income, and any other regular source of income.</li>
+            <li>Do not include public assistance (TANF, SSI) or child support received for other children.</li>
+          </ul>
+          <div class="tip">Use the <strong>Deduction Calculator</strong> in the right sidebar to add up allowable deductions before entering the total here.</div>
+        </div>
+      </div>
+
+      <!-- Step 3 -->
+      <div class="step-card">
+        <div class="step-number">3</div>
+        <div class="step-body">
+          <h2>Enter Monthly Deductions for Each Parent</h2>
+          <p>Enter each parent's total allowable monthly deductions. These reduce gross income to arrive at net income for child support purposes.</p>
+          <p>Common deductions include:</p>
+          <ul>
+            <li>Federal, state, and local income taxes (based on actual withholding or tax liability)</li>
+            <li>FICA / Social Security &amp; Medicare taxes</li>
+            <li>Mandatory retirement contributions</li>
+            <li>Previously ordered child support or spousal support being paid</li>
+            <li>Health insurance premiums for the parent only (not the children)</li>
+          </ul>
+          <p>The calculator will automatically compute each parent's <strong>Net Monthly Income</strong> and the <strong>Combined Net Income</strong>.</p>
+        </div>
+      </div>
+
+      <!-- Step 4 -->
+      <div class="step-card">
+        <div class="step-number">4</div>
+        <div class="step-body">
+          <h2>Look Up the Table 1 Support Amount</h2>
+          <p>Use the <strong>Table 1 Lookup</strong> tool in the right sidebar to find the base support obligation:</p>
+          <ul>
+            <li>Enter the combined monthly net income (shown automatically after completing Section 1).</li>
+            <li>Select the number of children subject to this order.</li>
+            <li>Click <strong>Total Support</strong> — the result is the basic monthly support amount from Nebraska's Schedule of Basic Support Obligations.</li>
+          </ul>
+          <p>Enter this amount in <strong>Section 3</strong> of the main calculator.</p>
+          <div class="tip">The table covers combined incomes from $500 to $20,000/month. Amounts outside that range are clamped to the table's limits.</div>
+        </div>
+      </div>
+
+      <!-- Step 5 -->
+      <div class="step-card">
+        <div class="step-number">5</div>
+        <div class="step-body">
+          <h2>Enter Health Insurance Premiums</h2>
+          <p>In <strong>Section 4</strong>, enter the monthly premium each parent pays for the children's health insurance coverage (not coverage for the parent personally).</p>
+          <ul>
+            <li>If neither parent carries coverage for the children, leave both fields at zero.</li>
+            <li>A warning will appear if a premium seems disproportionate relative to a parent's income.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Step 6 -->
+      <div class="step-card">
+        <div class="step-number">6</div>
+        <div class="step-body">
+          <h2>Enter Parenting Time (Nights)</h2>
+          <p>In <strong>Section 5</strong>, enter the number of nights per year each parent has the children in their physical custody.</p>
+          <ul>
+            <li>The two values must add up to 365.</li>
+            <li>This field is required for the Joint Physical Custody calculation type and affects credit calculations.</li>
+          </ul>
+          <div class="tip">Joint Physical Custody (JPC) generally applies when each parent has the child at least 109 nights per year (approximately 30%).</div>
+        </div>
+      </div>
+
+      <!-- Step 7 -->
+      <div class="step-card">
+        <div class="step-number">7</div>
+        <div class="step-body">
+          <h2>Select the Calculation Type</h2>
+          <p>Choose from the <strong>Calculation Type</strong> dropdown in Section 5:</p>
+          <ul>
+            <li><strong>Basic</strong> — Standard calculation where one parent pays the other based on each parent's share of combined income.</li>
+            <li><strong>Joint Physical Custody (JPC)</strong> — Applies a 1.5× multiplier to the Table 1 amount and then weights each parent's obligation by the other parent's parenting time percentage.</li>
+          </ul>
+          <p>Use JPC when parenting time is substantially shared between both parents.</p>
+        </div>
+      </div>
+
+      <!-- Step 8 -->
+      <div class="step-card">
+        <div class="step-number">8</div>
+        <div class="step-body">
+          <h2>Finalize the Calculation</h2>
+          <p>Click <strong>Finalize Calculation</strong>. The calculator will:</p>
+          <ul>
+            <li>Compute each parent's monthly child support obligation.</li>
+            <li>Apply health insurance credits.</li>
+            <li>Check whether either parent's income falls below the poverty guideline ($1,255/month) and adjust accordingly.</li>
+            <li>Display any warnings or notes in the messages area below the results.</li>
+          </ul>
+          <p>Review the results shown for the Mother and Father. A positive amount means that parent owes support to the other; credits and offsets are applied automatically.</p>
+        </div>
+      </div>
+
+      <!-- Step 9 -->
+      <div class="step-card">
+        <div class="step-number">9</div>
+        <div class="step-body">
+          <h2>Print or Save the Results</h2>
+          <p>Click <strong>Print Calculation</strong> in the sidebar to open a print-formatted summary of all inputs and results. Use your browser's print dialog to save as PDF or print a hard copy.</p>
+          <p>The printout includes the case name, all income and deduction values, insurance premiums, parenting time, and the final support amounts for both parents.</p>
+        </div>
+      </div>
+
+      <div class="guidelines-note">
+        <strong>Note:</strong> This calculator is provided as an informational tool only and does not constitute legal advice. Child support determinations involve factors beyond what this tool captures. Consult a licensed Nebraska attorney or contact the Nebraska Department of Health &amp; Human Services for guidance specific to your situation.
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>
