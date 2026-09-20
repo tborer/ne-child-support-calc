@@ -619,8 +619,24 @@ input.computed-field:focus {
 
 #finalize-calculation:hover { background-color: var(--blue-hover); }
 
+#finalize-calculation:disabled {
+  background-color: #9aa5b1;
+  border-color: #9aa5b1;
+  cursor: not-allowed;
+}
+
+#finalize-calculation:disabled:hover { background-color: #9aa5b1; }
+
 /* Hide SVG inside finalize button */
 #finalize-calculation svg { display: none; }
+
+.finalize-disabled-note {
+  width: 100%;
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #b91c1c;
+  text-align: center;
+}
 
 /* ─── Calc divider (double rule) ───────────────────────────────── */
 .calc-divider {

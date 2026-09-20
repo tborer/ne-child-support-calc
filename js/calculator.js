@@ -20,6 +20,23 @@ let calcType = '';
 
 const povertyGuideline = 1255;
 
+// ── Stripe payment gate ─────────────────────────────────────────────
+// This is a static site with no backend, so this is a "soft" gate: it
+// stops casual use of the button without paying, but a technical user
+// could bypass it client-side. See README for details/tradeoffs.
+const STRIPE_PAID_SESSION_KEY = 'ncsc_stripe_paid_session';
+const STRIPE_FORM_DATA_KEY    = 'ncsc_stripe_pending_form_data';
+
+function isStripeConfigured() {
+  return !!(window.APP_CONFIG &&
+    window.APP_CONFIG.ENABLE_STRIPE === true &&
+    window.APP_CONFIG.STRIPE_PAYMENT_LINK_URL);
+}
+
+function hasPaidThisSession() {
+  return sessionStorage.getItem(STRIPE_PAID_SESSION_KEY) === '1';
+}
+
 // ── Table 1 CSV data (loaded on page init) ────────────────────────
 // Rows: [income, 1-child-amount, 2-child-amount, ..., 6-child-amount]
 // Income range: $500 – $20,000 in $50 increments (391 rows)
@@ -44,6 +61,58 @@ fetch('data/ne-child-support-table-1.csv')
 // ── Document ready ────────────────────────────────────────────────
 jQuery(document).ready(function ($) {
 
+  function initStripeGate() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const returnedSessionId = urlParams.get('session_id');
+
+    if (returnedSessionId) {
+      sessionStorage.setItem(STRIPE_PAID_SESSION_KEY, '1');
+      restoreFormDataAfterPayment();
+      // Strip the query string so refreshing/sharing the URL doesn't replay it
+      const cleanUrl = window.location.pathname + window.location.hash;
+      window.history.replaceState({}, document.title, cleanUrl);
+    }
+
+    const $button = $('#finalize-calculation');
+    const $note = $('#finalize-disabled-note');
+    if (!isStripeConfigured()) {
+      $button.prop('disabled', true);
+      $note.show();
+    } else {
+      $button.prop('disabled', false);
+      $note.hide();
+    }
+  }
+
+  function saveFormDataBeforeRedirect() {
+    const fields = {};
+    $('#main-calc input, #main-calc select').each(function () {
+      if (this.id) fields[this.id] = $(this).val();
+    });
+    sessionStorage.setItem(STRIPE_FORM_DATA_KEY, JSON.stringify(fields));
+  }
+
+  function restoreFormDataAfterPayment() {
+    const saved = sessionStorage.getItem(STRIPE_FORM_DATA_KEY);
+    if (!saved) return;
+    sessionStorage.removeItem(STRIPE_FORM_DATA_KEY);
+    let fields;
+    try {
+      fields = JSON.parse(saved);
+    } catch (e) {
+      return;
+    }
+    Object.keys(fields).forEach(function (id) {
+      $('#' + id).val(fields[id]);
+    });
+    calcType = $('#calc-type').val() || '';
+    $('#mother-income, #mother-deductions, #father-income, #father-deductions, ' +
+      '#monthly-support-from-table-1, #mother-time-split, #father-time-split, ' +
+      '#mother-paid-health-insurance-premium, #father-paid-health-insurance-premium, ' +
+      '#mother-credit-for-health-insurance-premium-paid, ' +
+      '#father-credit-for-health-insurance-premium-paid').first().trigger('blur');
+  }
+
   // ── Initialize input defaults ───────────────────────────────────
   $('#mother-income').val(0);
   $('#mother-deductions').val(0);
@@ -55,6 +124,10 @@ jQuery(document).ready(function ($) {
   $('#father-credit-for-health-insurance-premium-paid').val(0);
   $('#mother-time-split').val(50);
   $('#father-time-split').val(50);
+
+  // ── Stripe: handle return from payment + set up button state ─────
+  // (runs after the defaults above so a restored form isn't overwritten)
+  initStripeGate();
 
   // ── Calculation type listener ───────────────────────────────────
   // (kept outside blur handler to avoid registering on every keystroke)
@@ -168,6 +241,13 @@ jQuery(document).ready(function ($) {
   // ── Finalize calculation button ─────────────────────────────────
   $('#finalize-calculation').on('click', function (event) {
     event.preventDefault();
+
+    if (isStripeConfigured() && !hasPaidThisSession()) {
+      saveFormDataBeforeRedirect();
+      window.location.href = window.APP_CONFIG.STRIPE_PAYMENT_LINK_URL;
+      return;
+    }
+
     runCalculations();
   });
 
