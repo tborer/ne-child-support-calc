@@ -116,10 +116,77 @@ index.html          Calculator page
 guidelines.html     Step-by-step usage guide
 css/styles.css      Site styling
 js/calculator.js    Calculation logic, validation, tools, print view
+js/config.js        Runtime feature flags (Stripe) — regenerated at deploy time
 data/ne-child-support-table-1.csv   Nebraska Table 1 support schedule
 childsup_table.pdf  Source PDF the CSV was derived from
 tests/              Playwright E2E specs
 ```
+
+## Google Search Console
+
+`index.html` includes a `google-site-verification` meta tag to verify site
+ownership in Google Search Console. It only needs to live on one page (the
+one Search Console fetches at the domain root).
+
+## Stripe payment gate
+
+The "Finalize Calculation" button can be gated behind a Stripe payment. Because
+this is a static site with no backend/server, this uses a **Stripe Payment
+Link** (no secret key, no server code) and is a *soft* gate: it stops casual
+use of the button without paying, but since all logic runs in the browser, a
+technically sophisticated user could bypass it (e.g. via devtools). There is
+no way to make this cryptographically enforceable without adding a backend
+(e.g. a serverless function that verifies the Stripe session server-side) —
+that's a bigger change and wasn't in scope here.
+
+### How it works
+
+1. If Stripe isn't enabled/configured, the "Finalize Calculation" button is
+   **disabled** and a message explains why.
+2. If Stripe is enabled and configured, clicking the button:
+   - **First click (unpaid):** saves the current form values to
+     `sessionStorage` and redirects the browser to the Stripe Payment Link.
+   - **After a successful payment:** Stripe redirects back to the site with
+     `?session_id={CHECKOUT_SESSION_ID}` in the URL (configured on the
+     Payment Link itself, see below). The page detects that, marks the
+     browser session as paid (`sessionStorage`, cleared when the tab/browser
+     session ends), restores the saved form values, and strips the query
+     string from the URL.
+   - **Subsequent clicks in the same browser session:** run the calculation
+     directly, without redirecting to Stripe again.
+
+### One-time Stripe setup
+
+1. In the [Stripe Dashboard](https://dashboard.stripe.com/), create a
+   **Product** and **Price** for the calculation (e.g. a one-time fee).
+2. Create a **Payment Link** for that price. Under the Payment Link's
+   **After payment** settings, choose **"Redirect customers to your
+   website"** and set the URL to:
+   ```
+   https://<your-site-domain>/?session_id={CHECKOUT_SESSION_ID}
+   ```
+   (Stripe fills in `{CHECKOUT_SESSION_ID}` automatically — keep it exactly
+   as shown.)
+3. Copy the Payment Link URL (e.g. `https://buy.stripe.com/xxxxxxxx`).
+
+### Environment variables (GitHub Actions repository variables)
+
+Since GitHub Pages serves static files with no server to read environment
+variables at request time, these are read at **deploy time** by
+`.github/workflows/deploy.yml`, which generates `js/config.js` from them.
+Set them under the repo's **Settings → Secrets and variables → Actions →
+Variables** tab:
+
+| Variable                  | Description                                                              |
+|----------------------------|---------------------------------------------------------------------------|
+| `ENABLE_STRIPE`            | `true` to enable the Stripe gate, `false` (or unset) to keep it disabled. |
+| `STRIPE_PAYMENT_LINK_URL`  | The Stripe Payment Link URL from setup step 3 above.                     |
+
+Neither value is a secret credential (no Stripe API key is used anywhere in
+this repo), so plain repository **variables** work — no need for encrypted
+secrets. Until both are set (`ENABLE_STRIPE=true` and a non-empty
+`STRIPE_PAYMENT_LINK_URL`), the Finalize Calculation button stays disabled
+and `js/config.js` keeps its checked-in defaults.
 
 ## Reference material
 

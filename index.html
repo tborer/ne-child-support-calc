@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Nebraska Child Support Calculator</title>
   <meta name="description" content="Calculate child support obligations under Nebraska Revised Statute § 42-364 and the Nebraska Child Support Guidelines." />
+  <meta name="google-site-verification" content="YBysy9DzcxHAzTNRWPy17eRaVqXEQpGMfjPW1Us2y3U" />
   <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
@@ -381,6 +382,7 @@
                   </select>
                 </div>
                 <button id="finalize-calculation" type="button">Finalize Calculation</button>
+                <p id="finalize-disabled-note" class="finalize-disabled-note" style="display:none;">Online payment is not yet enabled for this site. The calculator cannot be finalized until it is set up.</p>
               </div>
             </form>
           </div>
@@ -559,6 +561,7 @@
   <div id="fatherinsalertShown" style="display:none;"></div>
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="js/config.js"></script>
   <script src="js/calculator.js"></script>
 </body>
 </html>
