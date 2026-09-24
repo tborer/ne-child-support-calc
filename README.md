@@ -94,7 +94,8 @@ from the filesystem:
 
 ```bash
 python3 -m http.server 3000
-# then open http://localhost:3000
+# then open http://localhost:3000 (landing page)
+# or http://localhost:3000/calculator.html (calculator)
 ```
 
 ## Running the tests
@@ -112,15 +113,42 @@ server is needed.
 ## Project structure
 
 ```
-index.html          Calculator page
+index.html          Landing page (SEO entry point; links into the calculator)
+calculator.html     Calculator page
 guidelines.html     Step-by-step usage guide
 css/styles.css      Site styling
+css/landing.css     Landing-page styling
+robots.txt          Crawler rules + sitemap location
+sitemap.xml         Sitemap for search engines
 js/calculator.js    Calculation logic, validation, tools, print view
 js/config.js        Runtime feature flags (Stripe) — regenerated at deploy time
 data/ne-child-support-table-1.csv   Nebraska Table 1 support schedule
 childsup_table.pdf  Source PDF the CSV was derived from
 tests/              Playwright E2E specs
 ```
+
+## Landing page and SEO
+
+The site root (`index.html`) is a landing page built to rank for searches such
+as "Nebraska child support calculator" and send visitors to `calculator.html`.
+It includes:
+
+- A keyword-focused `<title>`, meta description, canonical URL, and Open
+  Graph/Twitter tags.
+- JSON-LD structured data: `WebSite`, `WebApplication`, and a `FAQPage` whose
+  questions match the visible FAQ section.
+- Content that answers common search questions: how Nebraska child support is
+  calculated, Worksheet 1 vs. Joint Physical Custody, allowed deductions,
+  health insurance, and a worked example drawn from Table 1.
+- Several calls to action pointing to the calculator, including a sticky
+  button on mobile that shows once the hero scrolls out of view.
+- No jQuery or other third-party scripts, so the page loads fast.
+
+**Site URL.** Canonical URLs, `og:url`, the JSON-LD, `robots.txt`, and
+`sitemap.xml` use `https://tborer.github.io/ne-child-support-calc/`. If the
+site moves to a custom domain, search-and-replace that prefix. Note that
+crawlers only read `robots.txt` at a domain root, so with a GitHub Pages
+project URL, submit `sitemap.xml` directly in Search Console.
 
 ## Google Search Console
 
@@ -163,10 +191,12 @@ that's a bigger change and wasn't in scope here.
    **After payment** settings, choose **"Redirect customers to your
    website"** and set the URL to:
    ```
-   https://<your-site-domain>/?session_id={CHECKOUT_SESSION_ID}
+   https://<your-site-domain>/calculator.html?session_id={CHECKOUT_SESSION_ID}
    ```
    (Stripe fills in `{CHECKOUT_SESSION_ID}` automatically — keep it exactly
-   as shown.)
+   as shown.) Payment Links that still point at the site root keep working:
+   the landing page forwards any `?session_id=` request to
+   `calculator.html`.
 3. Copy the Payment Link URL (e.g. `https://buy.stripe.com/xxxxxxxx`).
 
 ### Environment variables (GitHub Actions repository variables)

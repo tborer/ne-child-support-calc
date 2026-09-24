@@ -254,7 +254,7 @@ test.describe('Support Obligation Calculations (JPC)', () => {
       await dialog.dismiss();
     });
 
-    await page.goto('/');
+    await page.goto('/calculator.html');
   });
 
   for (const [id, mInc, mDed, fInc, fDed, t1, mIns, fIns, mSplit, fSplit, mOwes, fOwes] of CASES) {
