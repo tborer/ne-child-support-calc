@@ -120,10 +120,91 @@ a:hover {
   transition: color .15s, border-color .15s;
 }
 
+.nav-inner .nav-help {
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  font: inherit;
+  color: #c8c8c8;
+  font-size: .84rem;
+  letter-spacing: .03em;
+  padding: 10px 14px;
+  cursor: pointer;
+  transition: color .15s, border-color .15s;
+}
+
+.nav-inner .nav-help:hover,
+.nav-inner .nav-help:focus-visible {
+  color: var(--white);
+  border-bottom-color: var(--gold);
+}
+
 .nav-inner a:hover,
 .nav-inner a.active {
   color: var(--white);
   border-bottom-color: var(--gold);
+}
+
+/* ─── Help dialog ──────────────────────────────────────────────── */
+.help-dialog {
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  margin: auto;
+  padding: 0;
+  border: none;
+  border-top: 4px solid var(--gold);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 18px 50px rgba(0,0,0,.35);
+  color: var(--text);
+  font-family: var(--font-sans);
+}
+.help-dialog::backdrop { background: rgba(26,39,68,.6); }
+
+.help-form { padding: 20px 22px 18px; display: flex; flex-direction: column; gap: 6px; }
+.help-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.help-header h2 { font-family: var(--font-serif); color: var(--navy); font-size: 1.3rem; margin: 0; }
+.help-close {
+  background: none; border: none; font-size: 1.8rem; line-height: 1;
+  color: var(--gray-500); cursor: pointer; padding: 0 4px;
+}
+.help-close:hover { color: var(--navy); }
+.help-intro { font-size: .88rem; color: var(--gray-500); margin: 2px 0 8px; }
+.help-form label { font-weight: bold; font-size: .88rem; color: var(--navy); }
+.help-optional { font-weight: normal; color: var(--gray-500); }
+.help-form textarea,
+.help-form input[type="text"],
+.help-form input[type="email"] {
+  width: 100%;
+  height: auto;
+  color: var(--text);
+  font: inherit;
+  font-size: .95rem;
+  padding: 8px 10px;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+}
+.help-form textarea { resize: vertical; min-height: 120px; }
+.help-form textarea:focus,
+.help-form input[type="text"]:focus,
+.help-form input[type="email"]:focus { outline: 2px solid var(--blue); outline-offset: 0; border-color: var(--blue); }
+.help-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.help-hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.help-status { min-height: 1.4em; margin: 0; font-size: .9rem; }
+.help-status--error { color: #b91c1c; }
+.help-status--success { color: #15803d; font-weight: bold; }
+.help-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 4px; }
+.help-actions button {
+  font: inherit; font-size: .95rem; padding: 9px 18px;
+  border-radius: var(--radius-sm); cursor: pointer;
+}
+.help-cancel { background: var(--white); border: 1px solid var(--gray-300); color: var(--text); }
+.help-submit { background: var(--blue); border: 1px solid var(--blue); color: var(--white); font-weight: bold; }
+.help-submit:hover { background: var(--blue-dark); }
+.help-submit:disabled { opacity: .6; cursor: wait; }
+
+@media (max-width: 560px) {
+  .help-row { grid-template-columns: 1fr; gap: 0; }
 }
 
 /* ─── Page wrapper ─────────────────────────────────────────────── */

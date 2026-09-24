@@ -82,6 +82,23 @@ test('checkout rejects invalid inputs and non-POST', async () => {
   assert.strictEqual((await call(handler, {}, 'GET')).status, 405);
 });
 
+test("checkout reports Stripe's error code when Stripe rejects the request", async () => {
+  const handler = createCheckoutHandler({
+    env: ENV,
+    getStripe: () => ({ checkout: { sessions: { async create() {
+      const err = new Error("No such price: 'price_123'; a similar object exists in live mode");
+      err.type = 'StripeInvalidRequestError';
+      err.code = 'resource_missing';
+      throw err;
+    } } } }),
+  });
+  const { status, body } = await call(handler, { inputs: INPUTS });
+  assert.strictEqual(status, 502);
+  assert.strictEqual(body.stripeCode, 'resource_missing');
+  assert.match(body.message, /\(Stripe: resource_missing\)$/);
+  assert.ok(!body.message.includes('price_123'), 'Stripe details stay in the server log');
+});
+
 // ── /api/calculate ─────────────────────────────────────────────────
 test('calculate returns the result for a paid session with matching inputs', async () => {
   const handler = createCalculateHandler({ getStripe: stripeWith(paidSession()), env: ENV });
