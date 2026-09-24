@@ -15,10 +15,10 @@ module.exports = defineConfig({
     screenshot: 'only-on-failure',
     video: 'off',
   },
-  // Local server for the site + /api functions, with an in-memory fake Stripe
+  // Local server for the site + /api functions, with fake Stripe and SMTP
   webServer: {
     command: 'node scripts/dev-server.js',
-    env: { STRIPE_SECRET_KEY: '', PORT: '3000' },
+    env: { STRIPE_SECRET_KEY: '', SMTP_HOST: '', PORT: '3000' },
     port: 3000,
     reuseExistingServer: !process.env.CI,
     timeout: 15_000,

@@ -73,6 +73,9 @@ Browser alerts and on-page messages flag the conditions the guidelines care abou
 
 ### Interface
 
+- **Help form** — a **Help** item in the navigation (after Guidelines) on
+  every page opens a message form. Messages are emailed through SMTP by
+  `POST /api/help` (see [Help form email](#help-form-email)).
 - **Guidelines page** (`guidelines.html`) — a step-by-step walkthrough of how to
   fill in each section of the calculator.
 - **Contextual help** — hoverable/focusable `?` icons with per-field explanations.
@@ -154,6 +157,10 @@ scripts/dev-server.js  Local server for the site + /api (fake or real Stripe)
 vercel.json         Vercel build settings and security/cache headers
 api/checkout.js     POST /api/checkout — starts a Stripe Checkout for one calculation
 api/calculate.js    POST /api/calculate — verifies payment, returns the result
+api/help.js         POST /api/help — emails a help request via SMTP
+lib/help.js         Help-request validation + SMTP sending (nodemailer)
+lib/http.js         JSON response helpers shared by the /api handlers
+js/help.js          Help link + modal (all pages)
 lib/calc.js         Final Worksheet 1 / Joint Physical Custody formulas (server-side)
 lib/payments.js     Checkout + verification handlers
 js/calculator.js    Running totals, payment flow, validation, tools, print view
@@ -273,6 +280,21 @@ No webhook or Payment Link is needed; the redirect URLs are set in code.
 Vercel automatically (keep **Automatically expose System Environment
 Variables** on).
 
+### Troubleshooting "Could not start checkout"
+
+The message ends with Stripe's error code, e.g. `(Stripe: resource_missing)`,
+and the full Stripe message is in Vercel's function logs (**Deployment →
+Functions / Logs**, `api/checkout`). Common causes:
+
+| Code | Meaning |
+|------|---------|
+| `resource_missing` | `STRIPE_PRICE_ID` doesn't exist in the key's mode — e.g. a live Price with a test key. |
+| `StripeAuthenticationError` | `STRIPE_SECRET_KEY` is wrong, revoked, or has stray spaces. |
+| `StripePermissionError` | A restricted key without **Checkout Sessions: Write**. |
+| `parameter_invalid_*` / `url_invalid` | Usually a bad `SITE_URL` (it must start with `https://`). |
+
+Environment variable changes only apply after a **redeploy**.
+
 ### Possible later additions
 
 - **A few recalculations per payment.** This needs somewhere to count uses:
@@ -283,6 +305,28 @@ Variables** on).
 - **Refunds.** A refunded session still verifies as paid. Checking
   `payment_intent` refund status, or a `charge.refunded` webhook, would close
   that.
+
+## Help form email
+
+`POST /api/help` sends each help message as a plain-text email using
+[nodemailer](https://nodemailer.com/). The visitor's email, if they give
+one, is set as **Reply-To**, so you can reply directly. The form has a
+hidden honeypot field to drop simple bots.
+
+| Variable      | Required | Value |
+|---------------|----------|-------|
+| `SMTP_HOST`   | Yes | Mail server host, e.g. `smtp.gmail.com`, `smtp.office365.com`, `smtp.sendgrid.net`. |
+| `SMTP_PORT`   | Yes | `465` (implicit TLS) or `587` (STARTTLS). |
+| `SMTP_SECURE` | Yes | `true` with port 465, `false` with port 587. |
+| `SMTP_USER`   | Usually | SMTP login (often the full email address; `apikey` for SendGrid). |
+| `SMTP_PASS`   | Usually | SMTP password or app password. **Mark it Sensitive.** |
+| `SMTP_FROM`   | Yes | Sender address the server is allowed to send as, e.g. `Calculator <help@yourdomain.com>`. Messages are also delivered here. |
+| `HELP_TO`     | Optional | Deliver help messages to a different address than `SMTP_FROM`. |
+
+These are read at runtime, so set them for both Production and Preview and
+redeploy. Gmail and Microsoft 365 need an app password rather than your
+normal password. Without `SMTP_HOST` and `SMTP_FROM` the form answers "not set
+up yet".
 
 ## Reference material
 
