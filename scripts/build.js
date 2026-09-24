@@ -11,8 +11,10 @@
 // Environment variables (all optional):
 //   SITE_URL                 Public base URL, e.g. https://example.com/
 //                            On Vercel, defaults to the production domain.
-//   ENABLE_STRIPE            "true" turns on the Stripe payment gate.
-//   STRIPE_PAYMENT_LINK_URL  Stripe Payment Link the gate redirects to.
+//   ENABLE_STRIPE            "true" enables the Finalize (paid) button. The
+//                            server side also needs STRIPE_SECRET_KEY and
+//                            STRIPE_PRICE_ID (read by /api at runtime).
+//   PRICE_LABEL              Price shown next to Finalize, e.g. "$9.99".
 
 const fs = require('fs');
 const path = require('path');
@@ -65,7 +67,7 @@ function build() {
 
   const config = {
     ENABLE_STRIPE: process.env.ENABLE_STRIPE === 'true',
-    STRIPE_PAYMENT_LINK_URL: process.env.STRIPE_PAYMENT_LINK_URL || '',
+    PRICE_LABEL: process.env.PRICE_LABEL || '',
   };
   fs.writeFileSync(
     path.join(DIST, 'js', 'config.js'),

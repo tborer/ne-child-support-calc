@@ -6,7 +6,7 @@ on:
 
 jobs:
   test:
-    name: Playwright E2E Tests
+    name: Unit + Playwright E2E Tests
     runs-on: ubuntu-latest
 
     steps:
@@ -25,7 +25,7 @@ jobs:
         run: npx playwright install chromium --with-deps
 
       - name: Run tests
-        run: npx playwright test
+        run: npm test
 
       - name: Upload test report
         uses: actions/upload-artifact@v4

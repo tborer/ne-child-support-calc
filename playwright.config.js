@@ -3,6 +3,7 @@ const { defineConfig } = require('@playwright/test');
 
 module.exports = defineConfig({
   testDir: './tests',
+  testMatch: '**/*.spec.js', // tests/unit/*.test.js run under node --test
   timeout: 30_000,
   reporter: [
     ['list'],
@@ -14,9 +15,10 @@ module.exports = defineConfig({
     screenshot: 'only-on-failure',
     video: 'off',
   },
-  // Spin up Python's built-in HTTP server so fetch() works (needed for CSV load)
+  // Local server for the site + /api functions, with an in-memory fake Stripe
   webServer: {
-    command: 'python3 -m http.server 3000',
+    command: 'node scripts/dev-server.js',
+    env: { STRIPE_SECRET_KEY: '', PORT: '3000' },
     port: 3000,
     reuseExistingServer: !process.env.CI,
     timeout: 15_000,

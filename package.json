@@ -1,13 +1,20 @@
 {
   "name": "ne-child-support-calc",
   "version": "1.0.0",
-  "description": "Nebraska Child Support Calculator — automated E2E tests",
+  "description": "Nebraska Child Support Calculator",
   "scripts": {
-    "test": "playwright test",
+    "dev": "node scripts/dev-server.js",
+    "build": "node scripts/build.js",
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:unit": "node --test tests/unit/*.test.js",
+    "test:e2e": "playwright test",
     "test:report": "playwright show-report"
   },
   "devDependencies": {
     "@playwright/test": "^1.48.0",
     "jquery": "3.6.0"
+  },
+  "dependencies": {
+    "stripe": "22.6.2"
   }
 }

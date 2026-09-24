@@ -20,21 +20,25 @@ let calcType = '';
 
 const povertyGuideline = 1255;
 
-// ── Stripe payment gate ─────────────────────────────────────────────
-// This is a static site with no backend, so this is a "soft" gate: it
-// stops casual use of the button without paying, but a technical user
-// could bypass it client-side. See README for details/tradeoffs.
-const STRIPE_PAID_SESSION_KEY = 'ncsc_stripe_paid_session';
-const STRIPE_FORM_DATA_KEY    = 'ncsc_stripe_pending_form_data';
+// ── Stripe payment ──────────────────────────────────────────────
+// Finalizing is a paid, per-calculation step. The browser sends the inputs to
+// /api/checkout, which starts a Stripe Checkout; after payment Stripe returns
+// to this page with ?session_id=…, and /api/calculate verifies the payment
+// and returns the result. The final formulas live server-side in lib/calc.js.
+// See README "Stripe payments".
+const STRIPE_FORM_DATA_KEY = 'ncsc_stripe_pending_form_data';
+const PAID_CALC_KEY        = 'ncsc_paid_calculation';   // { sessionId, inputs }
 
-function isStripeConfigured() {
-  return !!(window.APP_CONFIG &&
-    window.APP_CONFIG.ENABLE_STRIPE === true &&
-    window.APP_CONFIG.STRIPE_PAYMENT_LINK_URL);
+function isStripeEnabled() {
+  return !!(window.APP_CONFIG && window.APP_CONFIG.ENABLE_STRIPE === true);
 }
 
-function hasPaidThisSession() {
-  return sessionStorage.getItem(STRIPE_PAID_SESSION_KEY) === '1';
+function readPaidCalculation() {
+  try {
+    return JSON.parse(sessionStorage.getItem(PAID_CALC_KEY) || 'null');
+  } catch (e) {
+    return null;
+  }
 }
 
 // ── Table 1 CSV data (loaded on page init) ────────────────────────
@@ -64,24 +68,49 @@ jQuery(document).ready(function ($) {
   function initStripeGate() {
     const urlParams = new URLSearchParams(window.location.search);
     const returnedSessionId = urlParams.get('session_id');
-
-    if (returnedSessionId) {
-      sessionStorage.setItem(STRIPE_PAID_SESSION_KEY, '1');
-      restoreFormDataAfterPayment();
-      // Strip the query string so refreshing/sharing the URL doesn't replay it
-      const cleanUrl = window.location.pathname + window.location.hash;
-      window.history.replaceState({}, document.title, cleanUrl);
-    }
+    const checkoutCanceled = urlParams.get('checkout') === 'canceled';
 
     const $button = $('#finalize-calculation');
-    const $note = $('#finalize-disabled-note');
-    if (!isStripeConfigured()) {
+    if (!isStripeEnabled()) {
       $button.prop('disabled', true);
-      $note.show();
+      $('#finalize-disabled-note').show();
+      $('#finalize-price-note').hide();
     } else {
       $button.prop('disabled', false);
-      $note.hide();
+      $('#finalize-disabled-note').hide();
+      const price = window.APP_CONFIG.PRICE_LABEL;
+      $('#finalize-price-note').text(
+        (price ? 'One-time fee of ' + price + ' per calculation' : 'One-time fee per calculation') +
+        ', paid securely through Stripe. Your numbers are not stored.'
+      ).show();
     }
+
+    if (!returnedSessionId && !checkoutCanceled) return;
+
+    const restored = restoreFormDataAfterPayment();
+    // Strip the query string so refreshing/sharing the URL doesn't replay it
+    window.history.replaceState({}, document.title, window.location.pathname + window.location.hash);
+
+    if (checkoutCanceled) {
+      setFinalizeStatus('Checkout was canceled. Your numbers are still here whenever you are ready.');
+      return;
+    }
+    if (!restored) {
+      setFinalizeStatus('We could not find the numbers for this payment in this browser tab. ' +
+        'If you were charged, contact us with your Stripe receipt.', true);
+      return;
+    }
+    const inputs = readFinalInputs();
+    if (!inputs) return;
+    sessionStorage.setItem(PAID_CALC_KEY, JSON.stringify({ sessionId: returnedSessionId, inputs: inputs }));
+    fetchPaidResult(returnedSessionId, inputs);
+  }
+
+  function setFinalizeStatus(message, isError) {
+    $('#finalize-status')
+      .text(message || '')
+      .toggleClass('finalize-status--error', !!isError)
+      .toggle(!!message);
   }
 
   function saveFormDataBeforeRedirect() {
@@ -94,13 +123,13 @@ jQuery(document).ready(function ($) {
 
   function restoreFormDataAfterPayment() {
     const saved = sessionStorage.getItem(STRIPE_FORM_DATA_KEY);
-    if (!saved) return;
+    if (!saved) return false;
     sessionStorage.removeItem(STRIPE_FORM_DATA_KEY);
     let fields;
     try {
       fields = JSON.parse(saved);
     } catch (e) {
-      return;
+      return false;
     }
     Object.keys(fields).forEach(function (id) {
       $('#' + id).val(fields[id]);
@@ -111,6 +140,7 @@ jQuery(document).ready(function ($) {
       '#mother-paid-health-insurance-premium, #father-paid-health-insurance-premium, ' +
       '#mother-credit-for-health-insurance-premium-paid, ' +
       '#father-credit-for-health-insurance-premium-paid').first().trigger('blur');
+    return true;
   }
 
   // ── Initialize input defaults ───────────────────────────────────
@@ -237,35 +267,113 @@ jQuery(document).ready(function ($) {
   // ── Finalize calculation button ─────────────────────────────────
   $('#finalize-calculation').on('click', function (event) {
     event.preventDefault();
+    if (!isStripeEnabled()) return;
 
-    if (isStripeConfigured() && !hasPaidThisSession()) {
-      saveFormDataBeforeRedirect();
-      window.location.href = window.APP_CONFIG.STRIPE_PAYMENT_LINK_URL;
+    const inputs = readFinalInputs();
+    if (!inputs) return;
+
+    // Already paid for exactly these numbers (e.g. after a refresh)? Don't charge again.
+    const paid = readPaidCalculation();
+    if (paid && JSON.stringify(paid.inputs) === JSON.stringify(inputs)) {
+      fetchPaidResult(paid.sessionId, inputs);
       return;
     }
 
-    runCalculations();
+    startCheckout(inputs);
   });
 
-  // ── Run all calculations and checks ────────────────────────────
-  function runCalculations() {
-    monthlySupportFromTable1         = parseFloat($('#monthly-support-from-table-1').val());
-    motherTimeSplit                  = parseFloat($('#mother-time-split').val()) / 100;
-    fatherTimeSplit                  = parseFloat($('#father-time-split').val()) / 100;
-    motherPaidHealthInsurancePremium = parseFloat($('#mother-paid-health-insurance-premium').val());
-    fatherPaidHealthInsurancePremium = parseFloat($('#father-paid-health-insurance-premium').val());
-    motherCreditForHealthInsurancePaid = parseFloat($('#mother-credit-for-health-insurance-premium-paid').val());
-    fatherCreditForHealthInsurancePaid = parseFloat($('#father-credit-for-health-insurance-premium-paid').val());
+  // ── Read the inputs the final calculation needs ─────────────────
+  // Also sets the globals the validation checks below use.
+  function readFinalInputs() {
+    const num = (selector) => parseFloat($(selector).val()) || 0;
 
-    if (calcType === 'joint-calc') {
-      calculateJPC();
-    } else if (calcType === 'basic-calc') {
-      calculateBasicSupport();
-    } else {
+    calcType = $('#calc-type').val() || '';
+    if (calcType !== 'joint-calc' && calcType !== 'basic-calc') {
       alert('Please select a Calculation Type before finalizing.');
-      return;
+      return null;
     }
 
+    monthlySupportFromTable1           = num('#monthly-support-from-table-1');
+    motherTimeSplit                    = num('#mother-time-split') / 100;
+    fatherTimeSplit                    = num('#father-time-split') / 100;
+    motherPaidHealthInsurancePremium   = num('#mother-paid-health-insurance-premium');
+    fatherPaidHealthInsurancePremium   = num('#father-paid-health-insurance-premium');
+    motherCreditForHealthInsurancePaid = num('#mother-credit-for-health-insurance-premium-paid');
+    fatherCreditForHealthInsurancePaid = num('#father-credit-for-health-insurance-premium-paid');
+
+    return {
+      calcType: calcType,
+      motherIncome: num('#mother-income'),
+      motherDeductions: num('#mother-deductions'),
+      fatherIncome: num('#father-income'),
+      fatherDeductions: num('#father-deductions'),
+      table1: monthlySupportFromTable1,
+      motherInsurance: motherPaidHealthInsurancePremium,
+      fatherInsurance: fatherPaidHealthInsurancePremium,
+      motherCredit: motherCreditForHealthInsurancePaid,
+      fatherCredit: fatherCreditForHealthInsurancePaid,
+      motherSplit: num('#mother-time-split'),
+      fatherSplit: num('#father-time-split'),
+    };
+  }
+
+  function postJson(url, body) {
+    return fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    }).then(function (response) {
+      return response.json().catch(function () { return {}; }).then(function (data) {
+        return { ok: response.ok, data: data };
+      });
+    });
+  }
+
+  // ── Start a Stripe Checkout for these inputs ────────────────────
+  function startCheckout(inputs) {
+    const $button = $('#finalize-calculation');
+    $button.prop('disabled', true);
+    setFinalizeStatus('Opening secure checkout…');
+    saveFormDataBeforeRedirect();
+
+    postJson('api/checkout', { inputs: inputs })
+      .then(function (reply) {
+        if (reply.ok && reply.data.url) {
+          window.location.href = reply.data.url;
+          return;
+        }
+        $button.prop('disabled', false);
+        setFinalizeStatus(reply.data.message || 'Could not start checkout. Please try again.', true);
+      })
+      .catch(function () {
+        $button.prop('disabled', false);
+        setFinalizeStatus('Could not reach the server. Check your connection and try again.', true);
+      });
+  }
+
+  // ── Fetch the verified result for a paid session ────────────────
+  function fetchPaidResult(sessionId, inputs) {
+    setFinalizeStatus('Confirming your payment…');
+    postJson('api/calculate', { sessionId: sessionId, inputs: inputs })
+      .then(function (reply) {
+        if (!reply.ok) {
+          setFinalizeStatus(reply.data.message || 'Could not verify your payment. Please try again.', true);
+          return;
+        }
+        setFinalizeStatus('Payment confirmed. Your results are below.');
+        $('#mother-child-support').text(reply.data.result.mother);
+        $('#father-child-support').text(reply.data.result.father);
+        runChecks();
+        const results = document.getElementById('results-heading');
+        if (results && results.scrollIntoView) results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      })
+      .catch(function () {
+        setFinalizeStatus('Could not reach the server to verify your payment. Refresh the page to try again.', true);
+      });
+  }
+
+  // ── Guideline checks, run once results are shown ────────────────
+  function runChecks() {
     checkParentTotalTimeSplit();
     checkJPCSplitMinMax();
     checkMotherNetIncomePoverty();
@@ -274,78 +382,6 @@ jQuery(document).ready(function ($) {
     checkFatherPaidInsurance();
     checkMotherObligationAndIns();
     checkFatherObligationAndIns();
-  }
-
-  // ── Basic Net Income Calculation (Worksheet 1) ──────────────────
-  function calculateBasicSupport() {
-    const motherCalculation = motherMonthlyShare - motherCreditForHealthInsurancePaid;
-    const fatherCalculation = fatherMonthlyShare - fatherCreditForHealthInsurancePaid;
-    $('#mother-child-support').text(motherCalculation.toFixed(0));
-    $('#father-child-support').text(fatherCalculation.toFixed(0));
-  }
-
-  // ── Joint Physical Custody Calculation ─────────────────────────
-  function calculateJPC() {
-    const motherCalculation   = ((motherPercentageContribution / 100) * (monthlySupportFromTable1 * 1.5)) * fatherTimeSplit;
-    const fatherCalculation   = ((fatherPercentageContribution / 100) * (monthlySupportFromTable1 * 1.5)) * motherTimeSplit;
-    const totalHealthPremium  = motherPaidHealthInsurancePremium + fatherPaidHealthInsurancePremium;
-    const motherShareOfPremium = (motherPercentageContribution * totalHealthPremium) / 100;
-    const fatherShareOfPremium = (fatherPercentageContribution * totalHealthPremium) / 100;
-
-    if ((motherPaidHealthInsurancePremium === 0 && fatherPaidHealthInsurancePremium === 0) ||
-        (motherPaidHealthInsurancePremium === fatherPaidHealthInsurancePremium)) {
-      let motherChildSupport = 0;
-      let fatherChildSupport = 0;
-      if (motherCalculation > fatherCalculation) {
-        motherChildSupport = motherCalculation - fatherCalculation;
-      } else {
-        fatherChildSupport = fatherCalculation - motherCalculation;
-      }
-      $('#mother-child-support').text(motherChildSupport.toFixed(0));
-      $('#father-child-support').text(fatherChildSupport.toFixed(0));
-      return;
-    }
-
-    // Different health insurance amounts — determine who owes support and insurance
-    let supportOwed = 0, supportParent = '';
-    if (motherCalculation > fatherCalculation) {
-      supportOwed = motherCalculation - fatherCalculation;
-      supportParent = 'Mother';
-    } else {
-      supportOwed = fatherCalculation - motherCalculation;
-      supportParent = 'Father';
-    }
-
-    let healthInsuranceOwed = 0, healthInsuranceParent = '';
-    if (motherShareOfPremium - motherPaidHealthInsurancePremium > 0) {
-      healthInsuranceOwed   = motherShareOfPremium - motherPaidHealthInsurancePremium;
-      healthInsuranceParent = 'Mother';
-    } else if (fatherShareOfPremium - fatherPaidHealthInsurancePremium > 0) {
-      healthInsuranceOwed   = fatherShareOfPremium - fatherPaidHealthInsurancePremium;
-      healthInsuranceParent = 'Father';
-    }
-
-    let motherChildSupport = 0, fatherChildSupport = 0;
-    if (supportParent === 'Mother' && healthInsuranceParent === 'Mother') {
-      motherChildSupport = supportOwed + healthInsuranceOwed;
-    } else if (supportParent === 'Father' && healthInsuranceParent === 'Father') {
-      fatherChildSupport = supportOwed + healthInsuranceOwed;
-    } else if (supportParent === 'Mother' && healthInsuranceParent === 'Father') {
-      if (healthInsuranceOwed > supportOwed) {
-        fatherChildSupport = healthInsuranceOwed - supportOwed;
-      } else {
-        motherChildSupport = supportOwed - healthInsuranceOwed;
-      }
-    } else if (supportParent === 'Father' && healthInsuranceParent === 'Mother') {
-      if (healthInsuranceOwed > supportOwed) {
-        motherChildSupport = healthInsuranceOwed - supportOwed;
-      } else {
-        fatherChildSupport = supportOwed - healthInsuranceOwed;
-      }
-    }
-
-    $('#mother-child-support').text(motherChildSupport.toFixed(0));
-    $('#father-child-support').text(fatherChildSupport.toFixed(0));
   }
 
   // ── Validation checks ───────────────────────────────────────────
