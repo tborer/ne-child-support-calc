@@ -3,12 +3,126 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Nebraska Child Support Calculator</title>
-  <meta name="description" content="Calculate child support obligations under Nebraska Revised Statute § 42-364 and the Nebraska Child Support Guidelines." />
+  <script>
+    // Stripe Payment Links redirect back to the site root with ?session_id=…
+    // Forward that return trip to the calculator so the paid session and the
+    // saved form values are restored there.
+    if (/[?&]session_id=/.test(window.location.search)) {
+      window.location.replace('calculator.html' + window.location.search + window.location.hash);
+    }
+  </script>
+  <title>Nebraska Child Support Calculator (2024 Guidelines) — Estimate Monthly Support</title>
+  <meta name="description" content="Estimate Nebraska child support in minutes. Uses the official Table 1 schedule, Worksheet 1 and Joint Physical Custody (Worksheet 3) rules, health insurance credits and parenting time. Private — runs in your browser." />
   <meta name="google-site-verification" content="YBysy9DzcxHAzTNRWPy17eRaVqXEQpGMfjPW1Us2y3U" />
+  <link rel="canonical" href="https://tborer.github.io/ne-child-support-calc/" />
+  <meta name="robots" content="index, follow, max-image-preview:large" />
+  <meta name="theme-color" content="#1a2744" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 52 52'%3E%3Ccircle cx='26' cy='26' r='25' fill='%23243460' stroke='%23b8952a' stroke-width='2'/%3E%3Ctext x='26' y='34' text-anchor='middle' fill='%23d4af4f' font-size='22' font-family='Georgia,serif' font-weight='bold'%3ENE%3C/text%3E%3C/svg%3E" />
+
+  <!-- Open Graph / social sharing -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Nebraska Child Support Calculator" />
+  <meta property="og:title" content="Nebraska Child Support Calculator — Estimate Monthly Support" />
+  <meta property="og:description" content="Estimator built on the Nebraska Child Support Guidelines: Table 1 lookup, Worksheet 1, Joint Physical Custody, health insurance credits and parenting time." />
+  <meta property="og:url" content="https://tborer.github.io/ne-child-support-calc/" />
+  <meta property="og:locale" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Nebraska Child Support Calculator" />
+  <meta name="twitter:description" content="Estimate Nebraska child support using the official Table 1 schedule and worksheets." />
+
   <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/landing.css" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://tborer.github.io/ne-child-support-calc/#website",
+        "name": "Nebraska Child Support Calculator",
+        "url": "https://tborer.github.io/ne-child-support-calc/",
+        "inLanguage": "en-US"
+      },
+      {
+        "@type": "WebApplication",
+        "name": "Nebraska Child Support Calculator",
+        "url": "https://tborer.github.io/ne-child-support-calc/calculator.html",
+        "applicationCategory": "FinanceApplication",
+        "operatingSystem": "Any (web browser)",
+        "browserRequirements": "Requires JavaScript",
+        "description": "Estimates monthly child support under the Nebraska Child Support Guidelines and Neb. Rev. Stat. § 42-364 using Table 1, Worksheet 1 and Joint Physical Custody calculations.",
+        "areaServed": { "@type": "State", "name": "Nebraska" },
+        "isPartOf": { "@id": "https://tborer.github.io/ne-child-support-calc/#website" }
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How is child support calculated in Nebraska?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Nebraska uses an income-shares model. Each parent's monthly net income (gross income minus allowed deductions such as taxes, FICA, mandatory retirement and support for other children) is combined. The combined net income and number of children are used to find the basic support amount in the Table 1 schedule. Health insurance premiums for the children are added, and the total obligation is split between the parents in proportion to their share of combined net income."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between Worksheet 1 and Joint Physical Custody (Worksheet 3)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Worksheet 1 is the basic net income calculation, typically used when one parent has the children most of the time. The Joint Physical Custody calculation (Worksheet 3) applies when parenting time is shared more evenly: the Table 1 amount is multiplied by 1.5 and each parent's share is weighted by the other parent's percentage of overnights, then the two obligations are offset."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "When does Nebraska use the joint physical custody calculation?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Under the Nebraska Child Support Guidelines, the joint physical custody worksheet is presumed to apply when a joint physical custody arrangement is ordered and each parent has the children for more than 142 days per year. This calculator also warns you if the time split you enter falls outside a 30%–70% range for either parent."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What deductions from gross income are allowed?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Common deductions include federal and state income taxes, FICA (Social Security and Medicare), mandatory retirement contributions, previously ordered child support, regular support for other children, and health insurance premiums for the parent. The calculator includes a Deduction Calculator to total these for each parent."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How does health insurance affect Nebraska child support?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The children's health insurance premium is added to the basic support amount, divided between the parents by their income percentages, and the parent who actually pays the premium receives a credit. The calculator flags premiums that exceed 3% of a parent's gross income."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is my information stored or sent anywhere?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. The calculator runs entirely in your web browser. The numbers you enter are not sent to or stored on a server."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is this calculator a substitute for a lawyer or a court order?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. Results are estimates for informational purposes and are not legal advice. Courts can deviate from the guidelines, and your final support amount is set by a court order. Consult a licensed Nebraska attorney and the official Nebraska Supreme Court worksheets for your case."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
 </head>
-<body>
+<body class="landing">
+
+  <a class="skip-link" href="#main">Skip to main content</a>
 
   <!-- ── Header ───────────────────────────────────────────────── -->
   <header class="site-header">
@@ -19,9 +133,10 @@
         <text x="26" y="30" text-anchor="middle" dominant-baseline="middle" fill="#d4af4f" font-size="7" font-family="Georgia,serif" font-weight="bold">NEBRASKA</text>
       </svg>
       <div class="header-titles">
-        <h1>Nebraska Child Support Calculator</h1>
+        <p class="brand-name">Nebraska Child Support Calculator</p>
         <p>Nebraska Child Support Guidelines</p>
       </div>
+      <a class="btn btn-gold header-cta" href="calculator.html">Open Calculator</a>
     </div>
     <div class="header-rule"></div>
   </header>
@@ -29,539 +144,250 @@
   <!-- ── Navigation ───────────────────────────────────────────── -->
   <nav class="site-nav" aria-label="Primary navigation">
     <div class="nav-inner">
-      <a href="index.html" class="active">Calculator</a>
+      <a href="./" class="active" aria-current="page">Home</a>
+      <a href="calculator.html">Calculator</a>
       <a href="guidelines.html">Guidelines</a>
     </div>
   </nav>
 
-  <!-- ── Page wrapper ──────────────────────────────────────────── -->
-  <div class="page-wrapper">
+  <main id="main">
 
-    <!-- ── Disclaimer ─────────────────────────────────────────── -->
-    <div class="disclaimer" role="note">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b8952a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r=".5" fill="#b8952a"/>
-      </svg>
-      <span>
-        Please remember that the following does not constitute legal advice. Step through the main sections and use the right sidebar tools for help as needed.
-        Input income items, deductions, insurance, medical support, and nights spent to see the calculation.
-        This uses browser popups for important messages — please enable popups for this site.
-        <strong>Select Joint Physical Custody or Basic calculation at the bottom.</strong>
-      </span>
-    </div>
-
-    <!-- ── Two-column outer layout ────────────────────────────── -->
-    <div class="outer-layout">
-
-      <!-- ════════════════════════════════════════════════════════
-           MAIN CALCULATOR COLUMN
-           ════════════════════════════════════════════════════════ -->
-      <main class="main-content" id="main-calc">
-
-        <!-- Case name -->
-        <div class="card">
-          <div class="card-body">
-            <div class="form-group mb-0">
-              <label for="case-name">Name or Case Name / Number:</label>
-              <input type="text" id="case-name" placeholder="e.g. Smith v. Smith — Case No. CI 24-000" />
-            </div>
+    <!-- ── Hero ──────────────────────────────────────────────── -->
+    <section class="hero" aria-labelledby="hero-heading">
+      <div class="lp-inner hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Built on the Nebraska Child Support Guidelines</p>
+          <h1 id="hero-heading">Nebraska Child Support Calculator</h1>
+          <p class="hero-lede">
+            Estimate monthly child support in Nebraska in about 10 minutes. Enter each parent's income,
+            deductions, health insurance and overnights — the calculator applies the official
+            <strong>Table 1</strong> schedule and the <strong>Worksheet 1</strong> or
+            <strong>Joint Physical Custody</strong> formula for you.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-gold btn-lg" href="calculator.html">Start Your Calculation</a>
+            <a class="btn btn-ghost btn-lg" href="guidelines.html">See How It Works</a>
           </div>
+          <ul class="trust-list" aria-label="Key features">
+            <li>Runs in your browser — nothing is uploaded</li>
+            <li>No account or sign-up</li>
+            <li>Printable worksheet summary</li>
+          </ul>
         </div>
 
-        <!-- ── Section 1: Income ─────────────────────────────── -->
-        <section class="card" aria-labelledby="income-heading">
-          <div class="card-header">
-            <svg class="card-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-            </svg>
-            <h2 id="income-heading">Section 1 &mdash; Monthly Income &amp; Deductions</h2>
-          </div>
-          <div class="card-body">
-            <form>
-              <div class="two-col-parents">
+        <!-- Visual preview of the result, not a live form -->
+        <figure class="hero-card" aria-labelledby="preview-caption">
+          <figcaption id="preview-caption" class="hero-card-title">Example estimate</figcaption>
+          <dl class="preview-rows">
+            <div><dt>Parent A net income</dt><dd>$4,000</dd></div>
+            <div><dt>Parent B net income</dt><dd>$2,000</dd></div>
+            <div><dt>Children</dt><dd>2</dd></div>
+            <div><dt>Table 1 basic support</dt><dd>$1,369</dd></div>
+            <div><dt>Parent A share (66.7%)</dt><dd>$913</dd></div>
+          </dl>
+          <p class="preview-result">
+            <span>Estimated monthly support paid by Parent A</span>
+            <strong>$913 / month</strong>
+          </p>
+          <p class="preview-note">Worksheet 1 example, before health insurance. <a href="#example">See the math</a>.</p>
+        </figure>
+      </div>
+    </section>
 
-                <!-- 1st Parent -->
-                <div class="parent-col">
-                  <fieldset>
-                    <legend>1st Parent</legend>
-                    <div class="form-group">
-                      <label for="mother-income">
-                        Monthly Income
-                        <span class="help-icon" data-help-text="Enter the total monthly gross income from all sources." tabindex="0">?</span>
-                      </label>
-                      <div class="input-prefix">
-                        <span>$</span>
-                        <input type="number" id="mother-income" name="mother-income" min="0" step="0.01" placeholder="0.00" aria-label="1st Parent's monthly income" />
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <label for="mother-deductions">
-                        Total Monthly Deductions
-                        <span class="help-icon" data-help-text="Use the Deduction Calculator in the sidebar for help calculating total deductions." tabindex="0">?</span>
-                      </label>
-                      <div class="input-prefix">
-                        <span>$</span>
-                        <input type="number" id="mother-deductions" name="mother-deductions" min="0" step="0.01" placeholder="0.00" aria-label="1st Parent's total deductions" />
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <label for="mother-net-income">Monthly Net Income</label>
-                      <div id="mother-net-income-container" class="computed-field-wrap">
-                        <span class="close-icon" id="mother-net-income-warning" aria-hidden="true"></span>
-                        <input type="number" id="mother-net-income" name="mother-net-income" class="computed-field" readonly aria-label="1st Parent's monthly net income" placeholder="—" />
-                      </div>
-                    </div>
-                  </fieldset>
-                </div>
+    <!-- ── Feature strip ─────────────────────────────────────── -->
+    <section class="lp-section" aria-labelledby="features-heading">
+      <div class="lp-inner">
+        <h2 id="features-heading" class="section-title">Everything the Nebraska worksheets ask for, in one place</h2>
+        <p class="section-sub">No spreadsheets or paper forms. Fill in each section and the numbers update as you go.</p>
+        <ul class="feature-grid">
+          <li class="feature">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h18v18H3zM3 9h18M9 21V9"/></svg>
+            <h3>Official Table 1 lookup</h3>
+            <p>Built-in Nebraska Schedule of Basic Support Obligations covering $500–$20,000 of combined monthly net income for 1 to 6 children.</p>
+          </li>
+          <li class="feature">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <h3>Worksheet 1 &amp; Joint Custody</h3>
+            <p>Choose the basic net income calculation or the Joint Physical Custody formula with the 1.5 multiplier and overnight weighting.</p>
+          </li>
+          <li class="feature">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            <h3>Health insurance credits</h3>
+            <p>Children's premiums are added to the obligation, split by income share, and credited back to the parent who pays them.</p>
+          </li>
+          <li class="feature">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8M8 10h8M8 14h4"/></svg>
+            <h3>Deduction calculator</h3>
+            <p>Total taxes, FICA, retirement, prior support orders, support for other children and more to get each parent's net income.</p>
+          </li>
+          <li class="feature">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4M12 17h.01"/></svg>
+            <h3>Guideline warnings</h3>
+            <p>Flags parenting time that doesn't total 100%, joint custody outside 30–70%, premiums over 3% of income and poverty-guideline issues.</p>
+          </li>
+          <li class="feature">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            <h3>Print-ready summary</h3>
+            <p>Open a formatted worksheet with every input and result — print it or save it as a PDF to bring to your attorney or mediator.</p>
+          </li>
+        </ul>
+      </div>
+    </section>
 
-                <!-- 2nd Parent -->
-                <div class="parent-col">
-                  <fieldset>
-                    <legend>2nd Parent</legend>
-                    <div class="form-group">
-                      <label for="father-income">
-                        Monthly Income
-                        <span class="help-icon" data-help-text="Enter the total monthly gross income from all sources." tabindex="0">?</span>
-                      </label>
-                      <div class="input-prefix">
-                        <span>$</span>
-                        <input type="number" id="father-income" name="father-income" min="0" step="0.01" placeholder="0.00" aria-label="2nd Parent's monthly income" />
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <label for="father-deductions">
-                        Total Monthly Deductions
-                        <span class="help-icon" data-help-text="Use the Deduction Calculator in the sidebar for help calculating total deductions." tabindex="0">?</span>
-                      </label>
-                      <div class="input-prefix">
-                        <span>$</span>
-                        <input type="number" id="father-deductions" name="father-deductions" min="0" step="0.01" placeholder="0.00" aria-label="2nd Parent's total deductions" />
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <label for="father-net-income">Monthly Net Income</label>
-                      <div id="father-net-income-container" class="computed-field-wrap">
-                        <span class="close-icon" id="father-net-income-warning" aria-hidden="true"></span>
-                        <input type="number" id="father-net-income" name="father-net-income" class="computed-field" readonly aria-label="2nd Parent's monthly net income" placeholder="—" />
-                      </div>
-                    </div>
-                  </fieldset>
-                </div>
-
-              </div><!-- /two-col-parents -->
-            </form>
-
-          </div>
-        </section>
-
-        <!-- Combined income — single-column centered display -->
-        <div class="single-col-container">
-          <div class="single-col-inner">
-            <label for="combined-net-income">Combined Monthly Net Income:</label>
-            <div id="combined-net-income" class="computed-display" aria-live="polite"></div>
-            <br>
-            <label for="combined-annual-net-income">Combined Annual Net Income:</label>
-            <br>
-            <div id="combined-annual-net-income" class="computed-display" aria-live="polite"></div>
-          </div>
+    <!-- ── How it works ──────────────────────────────────────── -->
+    <section class="lp-section lp-alt" aria-labelledby="steps-heading">
+      <div class="lp-inner">
+        <h2 id="steps-heading" class="section-title">How to calculate child support in Nebraska</h2>
+        <p class="section-sub">The calculator follows the same order as the Nebraska Supreme Court worksheets.</p>
+        <ol class="steps">
+          <li>
+            <h3>Enter monthly income &amp; deductions</h3>
+            <p>Add each parent's gross monthly income and allowable deductions. The calculator works out each parent's net income and combined total.</p>
+          </li>
+          <li>
+            <h3>Look up the Table 1 amount</h3>
+            <p>Use the built-in Table 1 tool with the combined net income and number of children to find the basic support obligation.</p>
+          </li>
+          <li>
+            <h3>Add health insurance &amp; parenting time</h3>
+            <p>Enter children's health insurance premiums and how many overnights each parent has per year.</p>
+          </li>
+          <li>
+            <h3>Choose the worksheet &amp; finalize</h3>
+            <p>Pick Worksheet 1 or Joint Physical Custody, then finalize to see what each parent owes and print the summary.</p>
+          </li>
+        </ol>
+        <div class="center-cta">
+          <a class="btn btn-gold btn-lg" href="calculator.html">Calculate Child Support Now</a>
+          <p class="cta-note">Have your pay stubs or tax return handy for the most accurate estimate.</p>
         </div>
+      </div>
+    </section>
 
-        <!-- ── Section 2: Percentage Contribution ───────────── -->
-        <section class="card" aria-labelledby="pct-heading">
-          <div class="card-header">
-            <svg class="card-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <circle cx="9" cy="9" r="3"/><circle cx="15" cy="15" r="3"/>
-              <line x1="5" y1="19" x2="19" y2="5"/>
-            </svg>
-            <h2 id="pct-heading">Section 2 &mdash; Percentage Contribution</h2>
-          </div>
-          <div class="card-body">
-            <div class="two-col-parents">
-              <div class="parent-col">
-                <fieldset>
-                  <legend>1st Parent</legend>
-                  <div class="form-group">
-                    <label for="mother-percentage-contribution">
-                      Percentage Contribution
-                      <span class="help-icon" data-help-text="The calculated share of the 1st Parent's contribution to combined net income." tabindex="0">?</span>
-                    </label>
-                    <div id="mother-percentage-contribution" class="computed-display computed-display--pct" aria-live="polite"></div>
-                  </div>
-                </fieldset>
-              </div>
-              <div class="parent-col">
-                <fieldset>
-                  <legend>2nd Parent</legend>
-                  <div class="form-group">
-                    <label for="father-percentage-contribution">
-                      Percentage Contribution
-                      <span class="help-icon" data-help-text="The calculated share of the 2nd Parent's contribution to combined net income." tabindex="0">?</span>
-                    </label>
-                    <div id="father-percentage-contribution" class="computed-display computed-display--pct" aria-live="polite"></div>
-                  </div>
-                </fieldset>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ── Section 3: Table 1 Support Amount ────────────── -->
-        <section class="card" aria-labelledby="table1-heading">
-          <div class="card-header">
-            <svg class="card-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/>
-              <line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/>
-            </svg>
-            <h2 id="table1-heading">Section 3 &mdash; Monthly Support From Table 1</h2>
-          </div>
-          <div class="card-body">
-            <div class="form-group mb-0">
-              <label for="monthly-support-from-table-1">
-                Monthly Support From Table 1
-                <span class="help-icon" data-help-text="If you do not have this amount, use the Table 1 Calculator in the right sidebar." tabindex="0">?</span>
-              </label>
-              <div class="input-prefix input-prefix--wide">
-                <span>$</span>
-                <input type="number" id="monthly-support-from-table-1" name="monthly-support-from-table-1" min="0" step="0.01" placeholder="0.00" />
-              </div>
-              <p class="form-hint">Use the <strong>Table 1 Calculator</strong> in the right sidebar if you need to look up this amount.</p>
-            </div>
-          </div>
-        </section>
-
-        <!-- ── Section 4: Health Insurance / Medical ─────────── -->
-        <section class="card" aria-labelledby="health-heading">
-          <div class="card-header">
-            <svg class="card-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
-            </svg>
-            <h2 id="health-heading">Section 4 &mdash; Health Insurance &amp; Medical Support</h2>
-          </div>
-          <div class="card-body">
-            <form>
-              <div class="two-col-parents">
-                <div class="parent-col">
-                  <fieldset>
-                    <legend>1st Parent</legend>
-                    <div class="form-group">
-                      <label for="mother-paid-health-insurance-premium">
-                        Paid Health Insurance Premium or Cash Medical Support As Ordered
-                        <span class="help-icon" data-help-text="The amount paid for children's health insurance premium, or the cash medical support amount as ordered by the court." tabindex="0">?</span>
-                      </label>
-                      <div class="input-prefix">
-                        <span>$</span>
-                        <input type="number" id="mother-paid-health-insurance-premium" name="mother-paid-health-insurance-premium" min="0" step="0.01" placeholder="0.00" aria-label="1st Parent's paid health insurance premium" />
-                      </div>
-                      <div id="mother-paid-health-insurance-premium-warning" class="warning-message-container" aria-live="polite"></div>
-                    </div>
-                  </fieldset>
-                </div>
-                <div class="parent-col">
-                  <fieldset>
-                    <legend>2nd Parent</legend>
-                    <div class="form-group">
-                      <label for="father-paid-health-insurance-premium">
-                        Paid Health Insurance Premium or Cash Medical Support As Ordered
-                        <span class="help-icon" data-help-text="The amount paid for children's health insurance premium, or the cash medical support amount as ordered by the court." tabindex="0">?</span>
-                      </label>
-                      <div class="input-prefix">
-                        <span>$</span>
-                        <input type="number" id="father-paid-health-insurance-premium" name="father-paid-health-insurance-premium" min="0" step="0.01" placeholder="0.00" aria-label="2nd Parent's paid health insurance premium" />
-                      </div>
-                      <div id="father-paid-health-insurance-premium-warning" class="warning-message-container" aria-live="polite"></div>
-                    </div>
-                  </fieldset>
-                </div>
-              </div>
-            </form>
-
-          </div>
-        </section>
-
-        <!-- Total obligation — single-column centered display -->
-        <div class="single-col-container">
-          <div class="single-col-inner">
-            <label for="total-obligation">Total Obligation:</label>
-            <br>
-            <div id="total-obligation" class="computed-display computed-display--total" aria-live="polite"></div>
-          </div>
+    <!-- ── Worked example ────────────────────────────────────── -->
+    <section class="lp-section" id="example" aria-labelledby="example-heading">
+      <div class="lp-inner narrow">
+        <h2 id="example-heading" class="section-title">Nebraska child support example</h2>
+        <p>
+          Here's a simplified Worksheet 1 calculation for two children who live primarily with Parent B.
+          It leaves out health insurance so you can see the core formula.
+        </p>
+        <div class="table-wrap">
+          <table class="example-table">
+            <caption class="visually-hidden">Worksheet 1 example calculation for two children</caption>
+            <thead>
+              <tr><th scope="col">Step</th><th scope="col">Parent A</th><th scope="col">Parent B</th><th scope="col">Combined</th></tr>
+            </thead>
+            <tbody>
+              <tr><th scope="row">Monthly net income</th><td>$4,000</td><td>$2,000</td><td>$6,000</td></tr>
+              <tr><th scope="row">Percentage of combined income</th><td>66.7%</td><td>33.3%</td><td>100%</td></tr>
+              <tr><th scope="row">Table 1 basic support (2 children at $6,000)</th><td>—</td><td>—</td><td>$1,369</td></tr>
+              <tr><th scope="row">Each parent's share</th><td>$913</td><td>$456</td><td>$1,369</td></tr>
+            </tbody>
+          </table>
         </div>
+        <p>
+          Because the children live with Parent B, Parent B's share is treated as spent directly on the children, and
+          <strong>Parent A pays about $913 per month</strong>. Add health insurance premiums, a shared-custody schedule
+          or a different income and the result changes, which is why it helps to run your own numbers.
+        </p>
+        <p><a class="text-cta" href="calculator.html">Run your own numbers in the calculator &rarr;</a></p>
+      </div>
+    </section>
 
-        <!-- ── Section 5: Monthly Share, Credits, Nights ──────── -->
-        <section class="card" aria-labelledby="share-heading">
-          <div class="card-header">
-            <svg class="card-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-            </svg>
-            <h2 id="share-heading">Section 5 &mdash; Monthly Share, Credits &amp; Parenting Time</h2>
-          </div>
-          <div class="card-body">
-            <form>
-              <div class="two-col-parents">
-
-                <!-- 1st Parent -->
-                <div class="parent-col">
-                  <fieldset>
-                    <legend>1st Parent</legend>
-                    <div class="form-group">
-                      <label>
-                        Monthly Share
-                        <span class="help-icon" data-help-text="The 1st Parent's share of the total obligation based on percentage contribution." tabindex="0">?</span>
-                      </label>
-                      <div id="mother-monthly-share" class="computed-display" aria-live="polite"></div>
-                    </div>
-                    <div class="form-group">
-                      <label for="mother-credit-for-health-insurance-premium-paid">
-                        Credit for Health Insurance Premium Paid
-                        <span class="help-icon" data-help-text="Credit amount for health insurance premiums paid by this parent." tabindex="0">?</span>
-                      </label>
-                      <div class="input-prefix">
-                        <span>$</span>
-                        <input type="number" id="mother-credit-for-health-insurance-premium-paid" name="mother-credit-for-health-insurance-premium-paid" min="0" step="0.01" placeholder="0.00" aria-label="1st Parent's credit for health insurance premium paid" />
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <label for="mother-time-split">
-                        Percent of Nights with 1st Parent
-                        <span class="help-icon" data-help-text="Percentage of overnights spent with the 1st parent. Must total 100% with the 2nd parent." tabindex="0">?</span>
-                      </label>
-                      <div class="input-prefix">
-                        <span>%</span>
-                        <input type="number" id="mother-time-split" name="mother-percentage-time-with-children" min="0" max="100" step="0.1" placeholder="0.0" aria-label="Percent of nights with 1st Parent" />
-                      </div>
-                    </div>
-                  </fieldset>
-                </div>
-
-                <!-- 2nd Parent -->
-                <div class="parent-col">
-                  <fieldset>
-                    <legend>2nd Parent</legend>
-                    <div class="form-group">
-                      <label>
-                        Monthly Share
-                        <span class="help-icon" data-help-text="The 2nd Parent's share of the total obligation based on percentage contribution." tabindex="0">?</span>
-                      </label>
-                      <div id="father-monthly-share" class="computed-display" aria-live="polite"></div>
-                    </div>
-                    <div class="form-group">
-                      <label for="father-credit-for-health-insurance-premium-paid">
-                        Credit for Health Insurance Premium Paid
-                        <span class="help-icon" data-help-text="Credit amount for health insurance premiums paid by this parent." tabindex="0">?</span>
-                      </label>
-                      <div class="input-prefix">
-                        <span>$</span>
-                        <input type="number" id="father-credit-for-health-insurance-premium-paid" name="father-credit-for-health-insurance-premium-paid" min="0" step="0.01" placeholder="0.00" aria-label="2nd Parent's credit for health insurance premium paid" />
-                      </div>
-                    </div>
-                    <div class="form-group">
-                      <label for="father-time-split">
-                        Percent of Nights with 2nd Parent
-                        <span class="help-icon" data-help-text="Percentage of overnights spent with the 2nd parent. Must total 100% with the 1st parent." tabindex="0">?</span>
-                      </label>
-                      <div class="input-prefix">
-                        <span>%</span>
-                        <input type="number" id="father-time-split" name="father-percentage-time-with-children" min="0" max="100" step="0.1" placeholder="0.0" aria-label="Percent of nights with 2nd Parent" />
-                      </div>
-                    </div>
-                  </fieldset>
-                </div>
-
-              </div><!-- /two-col-parents -->
-
-              <!-- Calculation type + finalize -->
-              <div class="finalize-row">
-                <div class="form-group mb-0">
-                  <label for="calc-type">Calculation Type:</label>
-                  <select id="calc-type" name="calc-type">
-                    <option value="" selected disabled>Please Select A Value</option>
-                    <option value="joint-calc">Joint Physical Custody Calculation</option>
-                    <option value="basic-calc">Basic Net Income Calculation (Worksheet 1)</option>
-                  </select>
-                </div>
-                <button id="finalize-calculation" type="button">Finalize Calculation</button>
-                <p id="finalize-disabled-note" class="finalize-disabled-note" style="display:none;">Online payment is not yet enabled for this site. The calculator cannot be finalized until it is set up.</p>
-              </div>
-            </form>
-          </div>
-        </section>
-
-        <!-- ── Results section ───────────────────────────────── -->
-        <div class="calc-divider" aria-hidden="true"></div>
-
-        <section class="card results-card" aria-labelledby="results-heading">
-          <div class="card-header card-header--results">
-            <svg class="card-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-            </svg>
-            <h2 id="results-heading">Calculation Results</h2>
-          </div>
-          <div class="card-body">
-            <div class="two-col-parents">
-              <div class="parent-col">
-                <fieldset class="results-fieldset">
-                  <legend>1st Parent</legend>
-                  <div class="form-group mb-0">
-                    <label class="results-label">1st Parent Owes:</label>
-                    <div id="mother-child-support" class="result-owed" aria-live="polite"></div>
-                  </div>
-                </fieldset>
-              </div>
-              <div class="parent-col">
-                <fieldset class="results-fieldset">
-                  <legend>2nd Parent</legend>
-                  <div class="form-group mb-0">
-                    <label class="results-label">2nd Parent Owes:</label>
-                    <div id="father-child-support" class="result-owed" aria-live="polite"></div>
-                  </div>
-                </fieldset>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- Calculation messages -->
-        <div class="card">
-          <div class="card-body">
-            <label>Messages about the calculation:</label>
-            <div id="calculation-messages" class="calc-messages" aria-live="polite"></div>
-          </div>
+    <!-- ── FAQ ───────────────────────────────────────────────── -->
+    <section class="lp-section lp-alt" aria-labelledby="faq-heading">
+      <div class="lp-inner narrow">
+        <h2 id="faq-heading" class="section-title">Nebraska child support FAQ</h2>
+        <div class="faq">
+          <details>
+            <summary>How is child support calculated in Nebraska?</summary>
+            <p>Nebraska uses an <em>income-shares</em> model. Each parent's monthly net income (gross income minus allowed deductions such as taxes, FICA, mandatory retirement and support for other children) is combined. The combined net income and number of children are used to find the basic support amount in the Table 1 schedule. Health insurance premiums for the children are added, and the total obligation is split between the parents in proportion to their share of combined net income.</p>
+          </details>
+          <details>
+            <summary>What is the difference between Worksheet 1 and Joint Physical Custody (Worksheet 3)?</summary>
+            <p>Worksheet 1 is the basic net income calculation, typically used when one parent has the children most of the time. The Joint Physical Custody calculation (Worksheet 3) applies when parenting time is shared more evenly: the Table 1 amount is multiplied by 1.5 and each parent's share is weighted by the other parent's percentage of overnights, then the two obligations are offset.</p>
+          </details>
+          <details>
+            <summary>When does Nebraska use the joint physical custody calculation?</summary>
+            <p>Under the Nebraska Child Support Guidelines, the joint physical custody worksheet is presumed to apply when a joint physical custody arrangement is ordered and each parent has the children for more than 142 days per year. This calculator also warns you if the time split you enter falls outside a 30%–70% range for either parent.</p>
+          </details>
+          <details>
+            <summary>What deductions from gross income are allowed?</summary>
+            <p>Common deductions include federal and state income taxes, FICA (Social Security and Medicare), mandatory retirement contributions, previously ordered child support, regular support for other children, and health insurance premiums for the parent. The calculator's Deduction Calculator totals these for each parent.</p>
+          </details>
+          <details>
+            <summary>How does health insurance affect Nebraska child support?</summary>
+            <p>The children's health insurance premium is added to the basic support amount, divided between the parents by their income percentages, and the parent who actually pays the premium receives a credit. The calculator flags premiums that exceed 3% of a parent's gross income.</p>
+          </details>
+          <details>
+            <summary>Is my information stored or sent anywhere?</summary>
+            <p>No. The calculator runs entirely in your web browser. The numbers you enter are not sent to or stored on a server.</p>
+          </details>
+          <details>
+            <summary>Is this calculator a substitute for a lawyer or a court order?</summary>
+            <p>No. Results are estimates for informational purposes and are not legal advice. Courts can deviate from the guidelines, and your final support amount is set by a court order. Consult a licensed Nebraska attorney and the official Nebraska Supreme Court worksheets for your case.</p>
+          </details>
         </div>
+      </div>
+    </section>
 
-      </main><!-- /main-content -->
+    <!-- ── Final CTA ─────────────────────────────────────────── -->
+    <section class="final-cta" aria-labelledby="final-cta-heading">
+      <div class="lp-inner">
+        <h2 id="final-cta-heading">Get your Nebraska child support estimate</h2>
+        <p>Walk through income, Table 1, insurance and parenting time step by step, and leave with a printable summary.</p>
+        <a class="btn btn-gold btn-lg" href="calculator.html">Start Your Calculation</a>
+      </div>
+    </section>
 
-      <!-- ════════════════════════════════════════════════════════
-           RIGHT SIDEBAR
-           ════════════════════════════════════════════════════════ -->
-      <aside class="right-sidebar" aria-label="Calculator tools">
-        <div class="sidebar-inner">
+    <!-- ── References ────────────────────────────────────────── -->
+    <section class="lp-section references" aria-labelledby="refs-heading">
+      <div class="lp-inner narrow">
+        <h2 id="refs-heading" class="section-title small">Official Nebraska resources</h2>
+        <ul class="landing-refs">
+          <li><a href="https://supremecourt.nebraska.gov/sites/default/files/worksheet1.pdf" target="_blank" rel="noopener">Nebraska Worksheet 1 — Basic Net Income and Support Calculation (PDF)</a></li>
+          <li><a href="https://supremecourt.nebraska.gov/sites/default/files/childsup_table.pdf" target="_blank" rel="noopener">Nebraska Table 1 — Schedule of Basic Support Obligations (PDF)</a></li>
+          <li><a href="https://supremecourt.nebraska.gov/sites/default/files/worksheet3.pdf" target="_blank" rel="noopener">Nebraska Worksheet 3 — Joint Physical Custody (PDF)</a></li>
+          <li><a href="https://supremecourt.nebraska.gov/" target="_blank" rel="noopener">Nebraska Supreme Court</a></li>
+        </ul>
+      </div>
+    </section>
 
-          <!-- Table 1 tool -->
-          <div class="table1-tool">
-            <h4>Table 1 Calculator</h4>
-            <form>
-              <div>
-                <label for="monthly-income">Combined Monthly Net Income:</label>
-                <input type="number" id="monthly-income" name="monthly-income" min="0" step="0.01" placeholder="0.00" />
-              </div>
-              <div>
-                <label for="num-children">Number of Children:</label>
-                <select id="num-children" name="num-children">
-                  <option value="1">1</option>
-                  <option value="2">2</option>
-                  <option value="3">3</option>
-                  <option value="4">4</option>
-                  <option value="5">5</option>
-                  <option value="6">6</option>
-                </select>
-              </div>
-              <button id="calculate-support" type="button">Total Support</button>
-              <div>
-                <label>Calculated Support Amount:</label>
-                <span id="support-amount" aria-live="polite"></span>
-              </div>
-            </form>
-          </div>
-
-          <div class="sidebar-divider"></div>
-
-          <!-- Deduction calculator accordion -->
-          <div class="accordion-container">
-            <button class="accordion-toggle" type="button" aria-expanded="false" aria-controls="deduction-calc-body">
-              Deduction Calculator
-            </button>
-            <div class="accordion-body deduction-calc" id="deduction-calc-body" data-expanded="false" hidden>
-              <h4>Total Deduction Calculator
-                <span class="help-icon" data-help-text="Complete fields for total deductions." tabindex="0">?</span>
-              </h4>
-              <p>You can use this if you are unsure of total deductions.</p>
-              <div>
-                <label for="taxes">Taxes:</label>
-                <input type="number" id="taxes" name="taxes" min="0" step="0.01" placeholder="0.00" />
-              </div>
-              <div>
-                <label for="fica">FICA:</label>
-                <input type="number" id="fica" name="fica" min="0" step="0.01" placeholder="0.00" />
-              </div>
-              <div>
-                <label for="retirement">Retirement:</label>
-                <input type="number" id="retirement" name="retirement" min="0" step="0.01" placeholder="0.00" />
-              </div>
-              <div>
-                <label for="child-support-previously-ordered">Child support previously ordered for other children:</label>
-                <input type="number" id="child-support-previously-ordered" name="child-support-previously-ordered" min="0" step="0.01" placeholder="0.00" />
-              </div>
-              <div>
-                <label for="regular-support-for-other-children">Regular support for other children:</label>
-                <input type="number" id="regular-support-for-other-children" name="regular-support-for-other-children" min="0" step="0.01" placeholder="0.00" />
-              </div>
-              <div>
-                <label for="cost-to-parent-for-health-insurance">Cost to the parent for health insurance for self:</label>
-                <input type="number" id="cost-to-parent-for-health-insurance" name="cost-to-parent-for-health-insurance" min="0" step="0.01" placeholder="0.00" />
-              </div>
-              <div>
-                <label for="child-tax-credit">Deductions for child tax credits:</label>
-                <input type="number" id="child-tax-credit" name="child-tax-credit" min="0" step="0.01" placeholder="0.00" />
-              </div>
-              <div>
-                <label for="other">Other:</label>
-                <input type="number" id="other" name="other" min="0" step="0.01" placeholder="0.00" />
-              </div>
-              <div class="sidebar-divider"></div>
-              <div class="sidebar-divider"></div>
-              <div>
-                <label for="total">Total:</label><br>
-                <span id="total" aria-live="polite"></span>
-              </div>
-            </div>
-          </div>
-
-          <div class="sidebar-divider"></div>
-
-          <!-- Print -->
-          <div class="print-tool">
-            <p>Printable version, opens in a new tab.</p>
-            <button id="print-calc" type="button">Print</button>
-          </div>
-
-          <div class="sidebar-divider"></div>
-
-          <!-- Reference material -->
-          <div class="reference-tool reference-material">
-            <h4>Reference Material</h4>
-            <p class="right-aligned-link">
-              <a href="https://supremecourt.nebraska.gov/sites/default/files/worksheet1.pdf" target="_blank" rel="noopener">NE Worksheet 1</a>
-            </p>
-            <p class="right-aligned-link">
-              <a href="https://supremecourt.nebraska.gov/sites/default/files/childsup_table.pdf" target="_blank" rel="noopener">NE Table 1</a>
-            </p>
-            <p class="right-aligned-link">
-              <a href="https://supremecourt.nebraska.gov/sites/default/files/worksheet3.pdf" target="_blank" rel="noopener">NE Worksheet 3</a>
-            </p>
-          </div>
-
-        </div><!-- /sidebar-inner -->
-      </aside><!-- /right-sidebar -->
-
-    </div><!-- /outer-layout -->
-  </div><!-- /page-wrapper -->
+  </main>
 
   <!-- ── Footer ───────────────────────────────────────────────── -->
   <footer class="site-footer">
-    <p>Nebraska Child Support Calculator &mdash; Informational use only. Not legal advice.</p>
+    <p>
+      <a href="./">Home</a> &middot;
+      <a href="calculator.html">Calculator</a> &middot;
+      <a href="guidelines.html">Guidelines</a>
+    </p>
     <hr class="footer-rule" />
+    <p>Nebraska Child Support Calculator &mdash; Informational use only. Not legal advice.</p>
     <p>Based on Nebraska Child Support Guidelines effective 2024 &middot;
        <a href="https://supremecourt.nebraska.gov/" target="_blank" rel="noopener">Nebraska Supreme Court</a></p>
   </footer>
 
-  <!-- Hidden alert-shown flags (used by calculation JS) -->
-  <div id="motherinsalertShown" style="display:none;"></div>
-  <div id="fatherinsalertShown" style="display:none;"></div>
+  <!-- Sticky mobile call to action -->
+  <div class="mobile-cta" id="mobile-cta">
+    <a class="btn btn-gold" href="calculator.html">Start Your Calculation</a>
+  </div>
+  <script>
+    // Show the sticky mobile CTA only once the hero buttons scroll out of view
+    // and hide it again over the closing CTA, so there's never a duplicate on screen.
+    (function () {
+      var bar = document.getElementById('mobile-cta');
+      var targets = document.querySelectorAll('.hero-actions, .final-cta');
+      if (!('IntersectionObserver' in window)) { bar.classList.add('is-visible'); return; }
+      var inView = new Set();
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) { e.isIntersecting ? inView.add(e.target) : inView.delete(e.target); });
+        bar.classList.toggle('is-visible', inView.size === 0);
+      });
+      targets.forEach(function (t) { io.observe(t); });
+    })();
+  </script>
 
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="js/config.js"></script>
-  <script src="js/calculator.js"></script>
 </body>
 </html>

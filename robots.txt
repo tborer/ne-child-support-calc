@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://tborer.github.io/ne-child-support-calc/sitemap.xml

@@ -29,27 +29,16 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Generate runtime config (Stripe feature flag)
+      - name: Build site
         env:
           ENABLE_STRIPE: ${{ vars.ENABLE_STRIPE }}
           STRIPE_PAYMENT_LINK_URL: ${{ vars.STRIPE_PAYMENT_LINK_URL }}
-        run: |
-          ENABLE_STRIPE_BOOL=false
-          if [ "$ENABLE_STRIPE" = "true" ]; then
-            ENABLE_STRIPE_BOOL=true
-          fi
-          cat > js/config.js <<EOF
-          window.APP_CONFIG = {
-            ENABLE_STRIPE: ${ENABLE_STRIPE_BOOL},
-            STRIPE_PAYMENT_LINK_URL: "${STRIPE_PAYMENT_LINK_URL}"
-          };
-          EOF
+        run: node scripts/build.js
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository (static site — no build step needed)
-          path: "."
+          path: dist
 
       - name: Deploy to GitHub Pages
         id: deployment

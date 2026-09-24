@@ -125,10 +125,6 @@ jQuery(document).ready(function ($) {
   $('#mother-time-split').val(50);
   $('#father-time-split').val(50);
 
-  // ── Stripe: handle return from payment + set up button state ─────
-  // (runs after the defaults above so a restored form isn't overwritten)
-  initStripeGate();
-
   // ── Calculation type listener ───────────────────────────────────
   // (kept outside blur handler to avoid registering on every keystroke)
   $('#calc-type').on('change', function () {
@@ -607,5 +603,11 @@ jQuery(document).ready(function ($) {
     `);
     printDocument.close();
   });
+
+  // ── Stripe: handle return from payment + set up button state ─────
+  // Runs last: after the input defaults above (so a restored form isn't
+  // overwritten) and after the blur handler is bound (so the blur that
+  // restoreFormDataAfterPayment() triggers recalculates the totals).
+  initStripeGate();
 
 }); // end document ready
