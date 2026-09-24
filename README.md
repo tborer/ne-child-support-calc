@@ -10,9 +10,11 @@ obligation, each parent's monthly share, and the final amount owed — using eit
 **Joint Physical Custody** calculation or the **Basic Net Income Calculation
 (Worksheet 1)**.
 
-The application is entirely client-side: plain HTML, CSS, and jQuery with no build
-step and no server. Nothing entered on the page is transmitted anywhere — all
-calculation happens in the browser. It is deployed as a static site to GitHub Pages.
+The application is entirely client-side: plain HTML, CSS, and jQuery with no
+server. Nothing entered on the page is transmitted anywhere — all calculation
+happens in the browser. A small dependency-free build script
+(`scripts/build.js`) copies the public files into `dist/`, which is deployed as a
+static site to Vercel (and, during the migration, to GitHub Pages).
 
 > **Disclaimer:** This tool is for informational use only and does not constitute
 > legal advice. Results are estimates; consult an attorney and the official
@@ -94,19 +96,28 @@ Browser alerts and on-page messages flag the conditions the guidelines care abou
   contact Stripe, so they pass whatever the deployed repository variables
   are. jQuery is served from `node_modules` (pinned to the same 3.6.0 as the
   page), so the suite doesn't depend on the CDN either.
-- **GitHub Actions** — automatic GitHub Pages deployment on push
-  (`.github/workflows/deploy.yml`) and a manually triggered test workflow
-  (`.github/workflows/test.yml`) that uploads the Playwright HTML report.
+- **Deployment** — Vercel builds and deploys from `vercel.json`; GitHub
+  Actions still deploys the same `dist/` to GitHub Pages on push
+  (`.github/workflows/deploy.yml`) until the migration is finished. A manually
+  triggered test workflow (`.github/workflows/test.yml`) uploads the
+  Playwright HTML report.
 
 ## Running locally
 
 The page fetches the Table 1 CSV, so it must be served over HTTP rather than opened
-from the filesystem:
+from the filesystem. You can serve the repo directly:
 
 ```bash
 python3 -m http.server 3000
 # then open http://localhost:3000 (landing page)
 # or http://localhost:3000/calculator.html (calculator)
+```
+
+or build and serve exactly what gets deployed:
+
+```bash
+node scripts/build.js
+python3 -m http.server 3000 --directory dist
 ```
 
 ## Running the tests
@@ -131,8 +142,10 @@ css/styles.css      Site styling
 css/landing.css     Landing-page styling
 robots.txt          Crawler rules + sitemap location
 sitemap.xml         Sitemap for search engines
+scripts/build.js    Builds dist/: copies site files, sets SITE_URL, writes js/config.js
+vercel.json         Vercel build settings and security/cache headers
 js/calculator.js    Calculation logic, validation, tools, print view
-js/config.js        Runtime feature flags (Stripe) — regenerated at deploy time
+js/config.js        Runtime feature flags (Stripe) — local-dev defaults; replaced in dist/ by the build
 data/ne-child-support-table-1.csv   Nebraska Table 1 support schedule
 childsup_table.pdf  Source PDF the CSV was derived from
 tests/              Playwright E2E specs
@@ -155,17 +168,50 @@ It includes:
   button on mobile that shows once the hero scrolls out of view.
 - No jQuery or other third-party scripts, so the page loads fast.
 
-**Site URL.** Canonical URLs, `og:url`, the JSON-LD, `robots.txt`, and
-`sitemap.xml` use `https://tborer.github.io/ne-child-support-calc/`. If the
-site moves to a custom domain, search-and-replace that prefix. Note that
-crawlers only read `robots.txt` at a domain root, so with a GitHub Pages
-project URL, submit `sitemap.xml` directly in Search Console.
+**Site URL.** The source files use `https://tborer.github.io/ne-child-support-calc/`
+for canonical URLs, `og:url`, the JSON-LD, `robots.txt`, and `sitemap.xml`.
+`scripts/build.js` rewrites that prefix to `SITE_URL` when it's set (on Vercel it
+defaults to the project's production domain), so the source files never need
+to change when the domain does.
 
 ## Google Search Console
 
 `index.html` includes a `google-site-verification` meta tag to verify site
 ownership in Google Search Console. It only needs to live on one page (the
 one Search Console fetches at the domain root).
+
+## Deploying to Vercel
+
+1. In Vercel, **Add New → Project** and import this GitHub repository.
+   `vercel.json` sets everything: no framework, build command
+   `node scripts/build.js`, output directory `dist`.
+2. Under **Settings → Environment Variables**, add:
+
+   | Variable                  | Value                                                                  |
+   |---------------------------|------------------------------------------------------------------------|
+   | `SITE_URL`                | Public URL with trailing slash, e.g. `https://example.com/`. Optional once a production domain is set, because the build falls back to it. |
+   | `ENABLE_STRIPE`           | `true` to turn on the payment gate (leave unset to keep it off).       |
+   | `STRIPE_PAYMENT_LINK_URL` | The Stripe Payment Link URL.                                           |
+
+   Environment variables only apply to new deployments, so redeploy after
+   changing them.
+3. **Settings → Domains**: add the custom domain and set the DNS records
+   Vercel shows.
+4. Update the Stripe Payment Link's after-payment redirect to
+   `https://<domain>/calculator.html?session_id={CHECKOUT_SESSION_ID}`.
+5. In Google Search Console, add the new domain (the existing verification
+   meta tag works; a DNS TXT record also covers subdomains) and submit
+   `https://<domain>/sitemap.xml`.
+
+Every pull request gets its own Vercel preview URL. Preview deployments only
+receive the environment variables scoped to **Preview**, so you can use a
+Stripe test-mode Payment Link there and the live link in **Production**.
+
+`vercel.json` also sends security headers on every response
+(`Content-Security-Policy`, `X-Frame-Options: DENY`, `nosniff`,
+`Referrer-Policy`, `Permissions-Policy`) and caches `data/` for a day. The CSP
+allows scripts only from the site itself and `code.jquery.com`; if you add a
+third-party script (analytics, for example), add its origin there.
 
 ## Stripe payment gate
 
@@ -210,12 +256,12 @@ that's a bigger change and wasn't in scope here.
    `calculator.html`.
 3. Copy the Payment Link URL (e.g. `https://buy.stripe.com/xxxxxxxx`).
 
-### Environment variables (GitHub Actions repository variables)
+### Environment variables
 
-Since GitHub Pages serves static files with no server to read environment
-variables at request time, these are read at **deploy time** by
-`.github/workflows/deploy.yml`, which generates `js/config.js` from them.
-Set them under the repo's **Settings → Secrets and variables → Actions →
+These are read at **build time** by `scripts/build.js`, which writes
+`dist/js/config.js` from them. On Vercel, set them in the project's
+environment variables (see above). For the GitHub Pages deploy, set them
+under the repo's **Settings → Secrets and variables → Actions →
 Variables** tab:
 
 | Variable                  | Description                                                              |
@@ -227,7 +273,7 @@ Neither value is a secret credential (no Stripe API key is used anywhere in
 this repo), so plain repository **variables** work — no need for encrypted
 secrets. Until both are set (`ENABLE_STRIPE=true` and a non-empty
 `STRIPE_PAYMENT_LINK_URL`), the Finalize Calculation button stays disabled
-and `js/config.js` keeps its checked-in defaults.
+and the generated config keeps Stripe off.
 
 ## Reference material
 

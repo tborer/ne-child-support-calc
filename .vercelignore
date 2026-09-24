@@ -1,0 +1,7 @@
+# Only scripts/build.js and the public site files are needed to build.
+node_modules
+tests
+playwright-report
+test-results
+.github
+childsup_table.pdf
