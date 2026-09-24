@@ -638,6 +638,19 @@ input.computed-field:focus {
   text-align: center;
 }
 
+.finalize-price-note,
+.finalize-status {
+  width: 100%;
+  margin: 4px 0 0;
+  font-size: 13px;
+  text-align: center;
+}
+
+.finalize-price-note { color: var(--gray-500); }
+
+.finalize-status { color: var(--blue-dark); font-weight: bold; }
+.finalize-status--error { color: #b91c1c; }
+
 /* ─── Calc divider (double rule) ───────────────────────────────── */
 .calc-divider {
   border-bottom: 4px solid #333;

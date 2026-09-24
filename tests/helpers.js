@@ -2,26 +2,6 @@
 const { expect } = require('@playwright/test');
 const path = require('path');
 
-const PAYMENT_LINK = 'https://buy.stripe.com/test_link';
-const PAID_KEY = 'ncsc_stripe_paid_session';
-
-/**
- * Serve a test js/config.js instead of the checked-in one, so tests don't
- * depend on how the deployed site's Stripe variables are set.
- */
-async function mockConfig(page, { stripe }) {
-  await serveLocalJquery(page);
-  const body = `window.APP_CONFIG = ${JSON.stringify({
-    ENABLE_STRIPE: stripe,
-    STRIPE_PAYMENT_LINK_URL: stripe ? PAYMENT_LINK : '',
-  })};`;
-  await page.route('**/js/config.js', (route) =>
-    route.fulfill({ contentType: 'application/javascript', body }));
-  // Never hit the real Stripe; stand in a blank page for the Payment Link.
-  await page.route('https://buy.stripe.com/**', (route) =>
-    route.fulfill({ contentType: 'text/html', body: '<title>Stripe</title>' }));
-}
-
 /**
  * Serve jQuery from node_modules instead of code.jquery.com so the suite
  * doesn't depend on the CDN being reachable. The version is pinned in
@@ -32,9 +12,15 @@ async function serveLocalJquery(page) {
     route.fulfill({ path: path.join(__dirname, '..', 'node_modules', 'jquery', 'dist', 'jquery.min.js') }));
 }
 
-/** Mark the browser session as already paid before any page script runs. */
-async function markPaid(page) {
-  await page.addInitScript((key) => sessionStorage.setItem(key, '1'), PAID_KEY);
+/**
+ * Serve a test js/config.js (payments on or off) instead of whatever the
+ * server has, and serve jQuery locally.
+ */
+async function mockConfig(page, { stripe }) {
+  await serveLocalJquery(page);
+  const body = `window.APP_CONFIG = ${JSON.stringify({ ENABLE_STRIPE: stripe, PRICE_LABEL: '$9.99' })};`;
+  await page.route('**/js/config.js', (route) =>
+    route.fulfill({ contentType: 'application/javascript', body }));
 }
 
 /** Dismiss the calculator's alert() warnings so they don't block the test. */
@@ -67,6 +53,12 @@ async function fillForm(page, tc) {
   await page.locator('#calc-type').selectOption(tc.type);
 }
 
+/** Click Finalize and land on the (fake) Stripe Checkout page. */
+async function goToCheckout(page) {
+  await page.locator('#finalize-calculation').click();
+  await page.waitForURL(/\/__fake-stripe\/checkout\/cs_test_/);
+}
+
 /**
  * Assert that an element's numeric text is within $1 of the expected amount
  * (intermediate floating-point rounding can shift the result by one).
@@ -81,7 +73,4 @@ async function expectAbout(page, selector, expected) {
     .toBeLessThanOrEqual(1);
 }
 
-module.exports = {
-  PAYMENT_LINK, PAID_KEY,
-  mockConfig, markPaid, dismissDialogs, fillAndBlur, fillForm, expectAbout,
-};
+module.exports = { mockConfig, dismissDialogs, fillAndBlur, fillForm, goToCheckout, expectAbout };

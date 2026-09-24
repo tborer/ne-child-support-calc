@@ -1,6 +1,6 @@
 # Nebraska Child Support Calculator
 
-A static, browser-based calculator for estimating monthly child support obligations
+A web calculator for estimating monthly child support obligations
 under the Nebraska Child Support Guidelines and Neb. Rev. Stat. § 42-364.
 
 Enter each parent's monthly gross income and deductions, the basic support amount
@@ -10,11 +10,12 @@ obligation, each parent's monthly share, and the final amount owed — using eit
 **Joint Physical Custody** calculation or the **Basic Net Income Calculation
 (Worksheet 1)**.
 
-The application is entirely client-side: plain HTML, CSS, and jQuery with no
-server. Nothing entered on the page is transmitted anywhere — all calculation
-happens in the browser. A small dependency-free build script
-(`scripts/build.js`) copies the public files into `dist/`, which is deployed as a
-static site to Vercel (and, during the migration, to GitHub Pages).
+The pages are plain HTML, CSS, and jQuery. Running totals are computed in the
+browser as the form is filled in. The final result is a paid, per-calculation
+step: two small Vercel serverless functions (`api/`) take payment through Stripe
+Checkout and compute the result only after the payment is verified. Inputs are
+never stored. `scripts/build.js` copies the public files into `dist/` for
+deployment.
 
 > **Disclaimer:** This tool is for informational use only and does not constitute
 > legal advice. Results are estimates; consult an attorney and the official
@@ -82,55 +83,61 @@ Browser alerts and on-page messages flag the conditions the guidelines care abou
 
 ### Testing and deployment
 
-- **Playwright E2E suite** — 18 focused tests (runs in about 10 seconds):
-  - `tests/calculation.spec.js` — one Joint Physical Custody case per code
-    path (who pays insurance, which parent owes, 30%/70% time-split edges),
-    a Worksheet 1 case, the running totals, and Table 1 lookups. Results are
+- **Unit tests** (`tests/unit/`, Node's built-in test runner, under a second):
+  - `calc.test.js` — the server-side formulas: one Joint Physical Custody
+    case per code path (who pays insurance, which parent owes, 30%/70%
+    time-split edges), Worksheet 1, and input validation. Results are
     checked within a $1 rounding tolerance.
-  - `tests/payment-gate.spec.js` — Finalize disabled when Stripe is off, an
-    unpaid click redirecting to the Payment Link, and the return trip
-    restoring the form and producing the correct result.
-  - `tests/landing.spec.js` — landing-page call to action and structured data.
+  - `payments.test.js` — the checkout and verification handlers with a stub
+    Stripe client: unpaid, paid, forged, other-app and changed-input cases.
+- **Playwright E2E tests** (`tests/*.spec.js`, about 10 seconds):
+  - `calculation.spec.js` — running totals and Table 1 lookups.
+  - `payment.spec.js` — the whole paid flow in a browser against the real
+    `/api` handlers and an in-memory fake Stripe: pay → result, cancel,
+    forged session id, same inputs free again, changed inputs charged again.
+  - `landing.spec.js` — landing-page call to action and structured data.
 
-  Tests replace `js/config.js` with their own Stripe settings and never
-  contact Stripe, so they pass whatever the deployed repository variables
-  are. jQuery is served from `node_modules` (pinned to the same 3.6.0 as the
-  page), so the suite doesn't depend on the CDN either.
-- **Deployment** — Vercel builds and deploys from `vercel.json`; GitHub
-  Actions still deploys the same `dist/` to GitHub Pages on push
-  (`.github/workflows/deploy.yml`) until the migration is finished. A manually
-  triggered test workflow (`.github/workflows/test.yml`) uploads the
-  Playwright HTML report.
+  The tests never contact Stripe or the jQuery CDN (jQuery is served from
+  `node_modules`, pinned to the page's 3.6.0).
+- **Deployment** — Vercel builds and deploys from `vercel.json`. GitHub
+  Actions still deploys the static pages to GitHub Pages
+  (`.github/workflows/deploy.yml`) with payments turned off, because Pages
+  can't run the `/api` functions. A manually triggered test workflow
+  (`.github/workflows/test.yml`) uploads the Playwright HTML report.
 
 ## Running locally
 
-The page fetches the Table 1 CSV, so it must be served over HTTP rather than opened
-from the filesystem. You can serve the repo directly:
-
 ```bash
-python3 -m http.server 3000
-# then open http://localhost:3000 (landing page)
-# or http://localhost:3000/calculator.html (calculator)
+npm install
+npm run dev
+# http://localhost:3000 (landing page), /calculator.html (calculator)
 ```
 
-or build and serve exactly what gets deployed:
+`npm run dev` (`scripts/dev-server.js`) serves the site and the `/api`
+functions the way Vercel does, with payments turned on. With no Stripe keys it
+uses an in-memory fake Stripe with its own Pay/Cancel page, so you can try the
+whole flow offline. To use your real Stripe **test** account instead:
 
 ```bash
-node scripts/build.js
-python3 -m http.server 3000 --directory dist
+STRIPE_SECRET_KEY=sk_test_... STRIPE_PRICE_ID=price_... PRICE_LABEL='$9.99' npm run dev
 ```
+
+and pay with Stripe's test card `4242 4242 4242 4242` (any future expiry, any CVC).
+
+To check the exact files that get deployed: `npm run build` writes them to `dist/`.
 
 ## Running the tests
 
 ```bash
 npm install
 npx playwright install chromium
-npm test          # run the suite
-npm run test:report   # open the HTML report
+npm test              # unit tests, then Playwright
+npm run test:unit     # unit tests only
+npm run test:report   # open the Playwright HTML report
 ```
 
-The Playwright config starts its own static server on port 3000, so no separate
-server is needed.
+Playwright starts `scripts/dev-server.js` (with the fake Stripe) on port 3000
+itself, so no separate server is needed.
 
 ## Project structure
 
@@ -143,12 +150,17 @@ css/landing.css     Landing-page styling
 robots.txt          Crawler rules + sitemap location
 sitemap.xml         Sitemap for search engines
 scripts/build.js    Builds dist/: copies site files, sets SITE_URL, writes js/config.js
+scripts/dev-server.js  Local server for the site + /api (fake or real Stripe)
 vercel.json         Vercel build settings and security/cache headers
-js/calculator.js    Calculation logic, validation, tools, print view
-js/config.js        Runtime feature flags (Stripe) — local-dev defaults; replaced in dist/ by the build
+api/checkout.js     POST /api/checkout — starts a Stripe Checkout for one calculation
+api/calculate.js    POST /api/calculate — verifies payment, returns the result
+lib/calc.js         Final Worksheet 1 / Joint Physical Custody formulas (server-side)
+lib/payments.js     Checkout + verification handlers
+js/calculator.js    Running totals, payment flow, validation, tools, print view
+js/config.js        Page flags (ENABLE_STRIPE, PRICE_LABEL) — local defaults; replaced in dist/ by the build
 data/ne-child-support-table-1.csv   Nebraska Table 1 support schedule
 childsup_table.pdf  Source PDF the CSV was derived from
-tests/              Playwright E2E specs
+tests/              Playwright E2E specs, unit tests, fake Stripe
 ```
 
 ## Landing page and SEO
@@ -184,28 +196,15 @@ one Search Console fetches at the domain root).
 
 1. In Vercel, **Add New → Project** and import this GitHub repository.
    `vercel.json` sets everything: no framework, build command
-   `node scripts/build.js`, output directory `dist`.
-2. Under **Settings → Environment Variables**, add:
-
-   | Variable                  | Value                                                                  |
-   |---------------------------|------------------------------------------------------------------------|
-   | `SITE_URL`                | Public URL with trailing slash, e.g. `https://example.com/`. Optional once a production domain is set, because the build falls back to it. |
-   | `ENABLE_STRIPE`           | `true` to turn on the payment gate (leave unset to keep it off).       |
-   | `STRIPE_PAYMENT_LINK_URL` | The Stripe Payment Link URL.                                           |
-
-   Environment variables only apply to new deployments, so redeploy after
-   changing them.
+   `node scripts/build.js`, output directory `dist`. The `api/` functions are
+   picked up automatically.
+2. Set the environment variables below (**Settings → Environment
+   Variables**) and redeploy — changes only apply to new deployments.
 3. **Settings → Domains**: add the custom domain and set the DNS records
    Vercel shows.
-4. Update the Stripe Payment Link's after-payment redirect to
-   `https://<domain>/calculator.html?session_id={CHECKOUT_SESSION_ID}`.
-5. In Google Search Console, add the new domain (the existing verification
+4. In Google Search Console, add the new domain (the existing verification
    meta tag works; a DNS TXT record also covers subdomains) and submit
    `https://<domain>/sitemap.xml`.
-
-Every pull request gets its own Vercel preview URL. Preview deployments only
-receive the environment variables scoped to **Preview**, so you can use a
-Stripe test-mode Payment Link there and the live link in **Production**.
 
 `vercel.json` also sends security headers on every response
 (`Content-Security-Policy`, `X-Frame-Options: DENY`, `nosniff`,
@@ -213,67 +212,77 @@ Stripe test-mode Payment Link there and the live link in **Production**.
 allows scripts only from the site itself and `code.jquery.com`; if you add a
 third-party script (analytics, for example), add its origin there.
 
-## Stripe payment gate
+## Stripe payments
 
-The "Finalize Calculation" button can be gated behind a Stripe payment. Because
-this is a static site with no backend/server, this uses a **Stripe Payment
-Link** (no secret key, no server code) and is a *soft* gate: it stops casual
-use of the button without paying, but since all logic runs in the browser, a
-technically sophisticated user could bypass it (e.g. via devtools). There is
-no way to make this cryptographically enforceable without adding a backend
-(e.g. a serverless function that verifies the Stripe session server-side) —
-that's a bigger change and wasn't in scope here.
+Finalizing a calculation costs a one-time fee. There is no subscription and
+no account.
 
 ### How it works
 
-1. If Stripe isn't enabled/configured, the "Finalize Calculation" button is
-   **disabled** and a message explains why.
-2. If Stripe is enabled and configured, clicking the button:
-   - **First click (unpaid):** saves the current form values to
-     `sessionStorage` and redirects the browser to the Stripe Payment Link.
-   - **After a successful payment:** Stripe redirects back to the site with
-     `?session_id={CHECKOUT_SESSION_ID}` in the URL (configured on the
-     Payment Link itself, see below). The page detects that, marks the
-     browser session as paid (`sessionStorage`, cleared when the tab/browser
-     session ends), restores the saved form values, and strips the query
-     string from the URL.
-   - **Subsequent clicks in the same browser session:** run the calculation
-     directly, without redirecting to Stripe again.
+1. The visitor fills in the form. Running totals (net incomes, percentages,
+   Table 1, monthly shares) are free and computed in the browser.
+2. **Finalize Calculation** sends the inputs to `POST /api/checkout`. The
+   function validates them and creates a Stripe Checkout Session (mode
+   `payment`, one unit of `STRIPE_PRICE_ID`). The session's metadata holds
+   `app: ne-child-support-calc` and a SHA-256 hash of the inputs; the numbers
+   themselves are not sent to Stripe. The browser keeps a copy of the form in
+   `sessionStorage` and goes to Stripe's hosted checkout page.
+3. After payment Stripe returns to `/calculator.html?session_id=cs_...`. The
+   page restores the form and calls `POST /api/calculate` with the session id
+   and inputs.
+4. `/api/calculate` retrieves the session from Stripe with the secret key and
+   returns the result only if the session is complete and paid, belongs to
+   this app, and the inputs hash to the stored value. The formulas are in
+   `lib/calc.js`, so the result can't be produced without that check.
+5. If checkout is canceled, Stripe returns to
+   `/calculator.html?checkout=canceled` and the form is restored with no charge.
+
+One payment covers one set of numbers. Asking again with the same numbers
+(a refresh, printing) doesn't charge again; changing any number starts a new
+checkout.
+
+Nothing is stored server-side: no database, and the functions don't log
+inputs. The paid session in Stripe is the record of each purchase.
 
 ### One-time Stripe setup
 
 1. In the [Stripe Dashboard](https://dashboard.stripe.com/), create a
-   **Product** and **Price** for the calculation (e.g. a one-time fee).
-2. Create a **Payment Link** for that price. Under the Payment Link's
-   **After payment** settings, choose **"Redirect customers to your
-   website"** and set the URL to:
-   ```
-   https://<your-site-domain>/calculator.html?session_id={CHECKOUT_SESSION_ID}
-   ```
-   (Stripe fills in `{CHECKOUT_SESSION_ID}` automatically — keep it exactly
-   as shown.) Payment Links that still point at the site root keep working:
-   the landing page forwards any `?session_id=` request to
-   `calculator.html`.
-3. Copy the Payment Link URL (e.g. `https://buy.stripe.com/xxxxxxxx`).
+   **Product** (e.g. "Nebraska child support calculation") with a
+   **one-time** Price. Copy the Price ID (`price_...`).
+2. Copy your **Secret key** from **Developers → API keys** (`sk_live_...`, or
+   `sk_test_...` in test mode). A
+   [restricted key](https://docs.stripe.com/keys#limit-access) with
+   **Checkout Sessions: Write** is enough and safer than the full secret key.
+3. Do the same in **test mode** (toggle in the Dashboard) to get a test Price
+   ID and test key for preview deployments. Test-mode and live-mode Prices are
+   separate objects with different IDs.
+
+No webhook or Payment Link is needed; the redirect URLs are set in code.
 
 ### Environment variables
 
-These are read at **build time** by `scripts/build.js`, which writes
-`dist/js/config.js` from them. On Vercel, set them in the project's
-environment variables (see above). For the GitHub Pages deploy, set them
-under the repo's **Settings → Secrets and variables → Actions →
-Variables** tab:
+| Variable            | Used by | Required | Value |
+|---------------------|---------|----------|-------|
+| `STRIPE_SECRET_KEY` | `/api` at runtime | Yes | Stripe secret or restricted key. `sk_live_…`/`rk_live_…` in Production, `sk_test_…`/`rk_test_…` in Preview. **Mark it Sensitive.** |
+| `STRIPE_PRICE_ID`   | `/api` at runtime | Yes | The one-time Price ID (`price_…`) from the same Stripe mode as the key. |
+| `ENABLE_STRIPE`     | build (page) | Yes | `true` enables the Finalize button. Without it the button is disabled with a "not yet enabled" note. |
+| `SITE_URL`          | build + `/api` | Recommended | Production URL with trailing slash, e.g. `https://example.com/`. Used for canonical/sitemap URLs and Stripe's return URLs. Falls back to Vercel's production domain. Preview deployments always return to their own preview URL. |
+| `PRICE_LABEL`       | build (page) | Optional | Price shown next to Finalize, e.g. `$9.99`. Keep it in sync with the Stripe Price. |
 
-| Variable                  | Description                                                              |
-|----------------------------|---------------------------------------------------------------------------|
-| `ENABLE_STRIPE`            | `true` to enable the Stripe gate, `false` (or unset) to keep it disabled. |
-| `STRIPE_PAYMENT_LINK_URL`  | The Stripe Payment Link URL from setup step 3 above.                     |
+`VERCEL_ENV`, `VERCEL_URL` and `VERCEL_PROJECT_PRODUCTION_URL` are set by
+Vercel automatically (keep **Automatically expose System Environment
+Variables** on).
 
-Neither value is a secret credential (no Stripe API key is used anywhere in
-this repo), so plain repository **variables** work — no need for encrypted
-secrets. Until both are set (`ENABLE_STRIPE=true` and a non-empty
-`STRIPE_PAYMENT_LINK_URL`), the Finalize Calculation button stays disabled
-and the generated config keeps Stripe off.
+### Possible later additions
+
+- **A few recalculations per payment.** This needs somewhere to count uses:
+  for example, record each paid input hash in the PaymentIntent's metadata,
+  or in a small key-value store (e.g. Upstash Redis via the Vercel
+  Marketplace), and allow up to N distinct hashes per session in
+  `lib/payments.js`.
+- **Refunds.** A refunded session still verifies as paid. Checking
+  `payment_intent` refund status, or a `charge.refunded` webhook, would close
+  that.
 
 ## Reference material
 

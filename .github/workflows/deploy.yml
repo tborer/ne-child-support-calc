@@ -29,10 +29,11 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      # GitHub Pages can't run the /api payment functions, so payments stay
+      # off here; the paid calculator runs on Vercel.
       - name: Build site
         env:
-          ENABLE_STRIPE: ${{ vars.ENABLE_STRIPE }}
-          STRIPE_PAYMENT_LINK_URL: ${{ vars.STRIPE_PAYMENT_LINK_URL }}
+          ENABLE_STRIPE: "false"
         run: node scripts/build.js
 
       - name: Upload artifact
