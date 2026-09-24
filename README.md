@@ -80,9 +80,20 @@ Browser alerts and on-page messages flag the conditions the guidelines care abou
 
 ### Testing and deployment
 
-- **Playwright E2E suite** — 139 Joint Physical Custody test cases
-  (`tests/calculation.spec.js`) asserting each parent's final obligation within a
-  $1 rounding tolerance, run against a local static server.
+- **Playwright E2E suite** — 18 focused tests (runs in about 10 seconds):
+  - `tests/calculation.spec.js` — one Joint Physical Custody case per code
+    path (who pays insurance, which parent owes, 30%/70% time-split edges),
+    a Worksheet 1 case, the running totals, and Table 1 lookups. Results are
+    checked within a $1 rounding tolerance.
+  - `tests/payment-gate.spec.js` — Finalize disabled when Stripe is off, an
+    unpaid click redirecting to the Payment Link, and the return trip
+    restoring the form and producing the correct result.
+  - `tests/landing.spec.js` — landing-page call to action and structured data.
+
+  Tests replace `js/config.js` with their own Stripe settings and never
+  contact Stripe, so they pass whatever the deployed repository variables
+  are. jQuery is served from `node_modules` (pinned to the same 3.6.0 as the
+  page), so the suite doesn't depend on the CDN either.
 - **GitHub Actions** — automatic GitHub Pages deployment on push
   (`.github/workflows/deploy.yml`) and a manually triggered test workflow
   (`.github/workflows/test.yml`) that uploads the Playwright HTML report.
