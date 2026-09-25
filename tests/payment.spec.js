@@ -86,6 +86,29 @@ test.describe('with payments on', () => {
     await goToCheckout(page);
   });
 
+  test('both Print buttons open the same printable summary with the result', async ({ page, context }) => {
+    await page.locator('#case-name').fill('Smith v. Smith');
+    await fillForm(page, JPC);
+    await goToCheckout(page);
+    await page.locator('#pay').click();
+    await expectAbout(page, '#mother-child-support', 70);
+
+    const printFrom = async (selector) => {
+      const [popup] = await Promise.all([context.waitForEvent('page'), page.locator(selector).click()]);
+      await popup.waitForLoadState();
+      const html = await popup.locator('body').innerHTML();
+      await popup.close();
+      return html;
+    };
+
+    await expect(page.locator('#print-calc-bottom')).toBeVisible();
+    const bottom = await printFrom('#print-calc-bottom');
+    const sidebar = await printFrom('#print-calc');
+    expect(bottom).toBe(sidebar);
+    expect(bottom).toContain('Smith v. Smith');
+    expect(bottom).toMatch(/Calculated Support Each Parent Owes[\s\S]*>70</);
+  });
+
   test('returning without saved numbers explains instead of failing silently', async ({ page }) => {
     await page.goto('/calculator.html?session_id=cs_test_forged1234567890');
     await expect(page.locator('#finalize-status')).toContainText('could not find the numbers for this payment');

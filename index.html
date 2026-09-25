@@ -11,8 +11,8 @@
       window.location.replace('calculator.html' + window.location.search + window.location.hash);
     }
   </script>
-  <title>Nebraska Child Support Calculator (2024 Guidelines) — Estimate Monthly Support</title>
-  <meta name="description" content="Estimate Nebraska child support in minutes. Uses the official Table 1 schedule, Worksheet 1 and Joint Physical Custody (Worksheet 3) rules, health insurance credits and parenting time. Private — runs in your browser." />
+  <title>Nebraska Child Support Calculator — $9.99, No Subscription</title>
+  <meta name="description" content="Calculate Nebraska child support for a one-time $9.99. No subscription, no account. Uses the official Table 1 schedule, Worksheet 1 and Joint Physical Custody rules, health insurance credits and parenting time. Fill it in free before you pay." />
   <meta name="google-site-verification" content="YBysy9DzcxHAzTNRWPy17eRaVqXEQpGMfjPW1Us2y3U" />
   <link rel="canonical" href="https://tborer.github.io/ne-child-support-calc/" />
   <meta name="robots" content="index, follow, max-image-preview:large" />
@@ -22,13 +22,13 @@
   <!-- Open Graph / social sharing -->
   <meta property="og:type" content="website" />
   <meta property="og:site_name" content="Nebraska Child Support Calculator" />
-  <meta property="og:title" content="Nebraska Child Support Calculator — Estimate Monthly Support" />
-  <meta property="og:description" content="Estimator built on the Nebraska Child Support Guidelines: Table 1 lookup, Worksheet 1, Joint Physical Custody, health insurance credits and parenting time." />
+  <meta property="og:title" content="Nebraska Child Support Calculator — $9.99, No Subscription" />
+  <meta property="og:description" content="Need a Nebraska child support number? Pay $9.99 once, with no subscription or account. Built on the official Table 1 schedule and worksheets." />
   <meta property="og:url" content="https://tborer.github.io/ne-child-support-calc/" />
   <meta property="og:locale" content="en_US" />
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="Nebraska Child Support Calculator" />
-  <meta name="twitter:description" content="Estimate Nebraska child support using the official Table 1 schedule and worksheets." />
+  <meta name="twitter:description" content="Nebraska child support calculations for $9.99 each. No subscription, no account." />
 
   <link rel="stylesheet" href="css/styles.css" />
   <link rel="stylesheet" href="css/landing.css" />
@@ -53,6 +53,12 @@
         "browserRequirements": "Requires JavaScript",
         "description": "Estimates monthly child support under the Nebraska Child Support Guidelines and Neb. Rev. Stat. § 42-364 using Table 1, Worksheet 1 and Joint Physical Custody calculations.",
         "areaServed": { "@type": "State", "name": "Nebraska" },
+        "offers": {
+          "@type": "Offer",
+          "price": "9.99",
+          "priceCurrency": "USD",
+          "description": "One-time fee per calculation. No subscription or account."
+        },
         "isPartOf": { "@id": "https://tborer.github.io/ne-child-support-calc/#website" }
       },
       {
@@ -111,7 +117,23 @@
             "name": "How much does it cost?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Entering your numbers, seeing the running totals and using the Table 1 and deduction tools is free. Finalizing a calculation is a one-time fee, paid securely through Stripe. There is no subscription and no account to create."
+              "text": "$9.99 per calculation. Entering your numbers, seeing the running totals and using the Table 1 and deduction tools is free, so you can check everything before you pay. When you are ready for the final result, you pay a one-time $9.99 through Stripe's secure checkout. There is no subscription, no account and nothing that renews."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Do I need a subscription or an account?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No. Each calculation is a single $9.99 payment. There is no monthly or annual plan, no account to create and nothing to cancel later."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What if I need to change my numbers?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Viewing the same result again, for example after a refresh or to print it, is free. Each new set of numbers is a new calculation at $9.99."
             }
           },
           {
@@ -164,28 +186,31 @@
     <section class="hero" aria-labelledby="hero-heading">
       <div class="lp-inner hero-grid">
         <div class="hero-copy">
-          <p class="eyebrow">Built on the Nebraska Child Support Guidelines</p>
+          <p class="eyebrow">$9.99 per calculation · No subscription</p>
           <h1 id="hero-heading">Nebraska Child Support Calculator</h1>
           <p class="hero-lede">
-            Estimate monthly child support in Nebraska in about 10 minutes. Enter each parent's income,
-            deductions, health insurance and overnights — the calculator applies the official
-            <strong>Table 1</strong> schedule and the <strong>Worksheet 1</strong> or
-            <strong>Joint Physical Custody</strong> formula for you.
+            Need a Nebraska child support number? You shouldn't have to sign up for a monthly plan to get one.
+            Enter each parent's income, deductions, health insurance and overnights, and the calculator applies the
+            official <strong>Table 1</strong> schedule and the <strong>Worksheet 1</strong> or
+            <strong>Joint Physical Custody</strong> formula for you. Fill it in free, then pay a one-time
+            <strong>$9.99</strong> when you're ready for your result.
           </p>
           <div class="hero-actions">
             <a class="btn btn-gold btn-lg" href="calculator.html">Start Your Calculation</a>
-            <a class="btn btn-ghost btn-lg" href="guidelines.html">See How It Works</a>
+            <a class="btn btn-ghost btn-lg" href="#pricing">What $9.99 Gets You</a>
           </div>
+          <p class="cta-micro">Free to fill in · $9.99 one time for your result · Secure checkout by Stripe</p>
           <ul class="trust-list" aria-label="Key features">
-            <li>One-time fee per calculation — no subscription</li>
-            <li>No account or sign-up; your numbers are never stored</li>
+            <li>$9.99 once. Never a subscription</li>
+            <li>No account or sign-up</li>
+            <li>Your numbers are never stored</li>
             <li>Printable worksheet summary</li>
           </ul>
         </div>
 
         <!-- Visual preview of the result, not a live form -->
         <figure class="hero-card" aria-labelledby="preview-caption">
-          <figcaption id="preview-caption" class="hero-card-title">Example estimate</figcaption>
+          <figcaption id="preview-caption" class="hero-card-title">Example estimate <span class="hero-badge">$9.99 · one time</span></figcaption>
           <dl class="preview-rows">
             <div><dt>Parent A net income</dt><dd>$4,000</dd></div>
             <div><dt>Parent B net income</dt><dd>$2,000</dd></div>
@@ -242,8 +267,60 @@
       </div>
     </section>
 
+    <!-- ── Pricing ───────────────────────────────────────────── -->
+    <section class="lp-section lp-alt" id="pricing" aria-labelledby="pricing-heading">
+      <div class="lp-inner">
+        <h2 id="pricing-heading" class="section-title">Pay once. Get your number. Done.</h2>
+        <p class="section-sub">
+          Most people need a child support figure once: before mediation, a hearing, or a conversation with the
+          other parent. You shouldn't need a subscription for that.
+        </p>
+        <div class="pricing-grid">
+          <div class="price-card">
+            <p class="price-kicker">One calculation</p>
+            <p class="price-amount"><span class="price-currency">$</span>9.99</p>
+            <p class="price-terms">One-time payment · No subscription · No account</p>
+            <ul class="price-list">
+              <li>Official Nebraska Table 1 support schedule</li>
+              <li>Worksheet 1 or Joint Physical Custody calculation</li>
+              <li>Health insurance credits and parenting-time weighting</li>
+              <li>Guideline warnings (poverty guideline, 3% insurance, time split)</li>
+              <li>Printable summary to bring to your attorney or mediator</li>
+              <li>View the same result again at no extra charge</li>
+            </ul>
+            <a class="btn btn-gold btn-lg price-cta" href="calculator.html">Start Your Calculation</a>
+            <p class="price-note">Fill in every section free. You only pay when you're ready to see the final result.</p>
+          </div>
+
+          <div class="compare">
+            <h3 class="compare-title">How it compares</h3>
+            <ul class="compare-list">
+              <li>
+                <h4>Working the worksheets by hand</h4>
+                <p>Free, but it means hours with PDFs, the Table 1 schedule and a calculator, and one slipped
+                  decimal changes the answer.</p>
+              </li>
+              <li>
+                <h4>Subscription calculators and legal software</h4>
+                <p>Monthly or annual plans, accounts and automatic renewals, for a number you may only need once.</p>
+              </li>
+              <li class="compare-us">
+                <h4>This calculator</h4>
+                <p><strong>$9.99, one time.</strong> The same official Table 1 and worksheet formulas, with your
+                  result in minutes and nothing to cancel later.</p>
+              </li>
+            </ul>
+            <p class="compare-secure">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+              Payments are processed by Stripe. Card details never reach this site, and your numbers are never stored.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- ── How it works ──────────────────────────────────────── -->
-    <section class="lp-section lp-alt" aria-labelledby="steps-heading">
+    <section class="lp-section" aria-labelledby="steps-heading">
       <div class="lp-inner">
         <h2 id="steps-heading" class="section-title">How to calculate child support in Nebraska</h2>
         <p class="section-sub">The calculator follows the same order as the Nebraska Supreme Court worksheets.</p>
@@ -261,19 +338,19 @@
             <p>Enter children's health insurance premiums and how many overnights each parent has per year.</p>
           </li>
           <li>
-            <h3>Choose the worksheet &amp; finalize</h3>
-            <p>Pick Worksheet 1 or Joint Physical Custody, then finalize to see what each parent owes and print the summary.</p>
+            <h3>Pay $9.99 &amp; get your result</h3>
+            <p>Pick Worksheet 1 or Joint Physical Custody and finalize. After a one-time $9.99 checkout you'll see what each parent owes, ready to print.</p>
           </li>
         </ol>
         <div class="center-cta">
           <a class="btn btn-gold btn-lg" href="calculator.html">Calculate Child Support Now</a>
-          <p class="cta-note">Have your pay stubs or tax return handy for the most accurate estimate.</p>
+          <p class="cta-note">Free to fill in, $9.99 one time for your result. Have your pay stubs or tax return handy for the most accurate estimate.</p>
         </div>
       </div>
     </section>
 
     <!-- ── Worked example ────────────────────────────────────── -->
-    <section class="lp-section" id="example" aria-labelledby="example-heading">
+    <section class="lp-section lp-alt" id="example" aria-labelledby="example-heading">
       <div class="lp-inner narrow">
         <h2 id="example-heading" class="section-title">Nebraska child support example</h2>
         <p>
@@ -299,12 +376,12 @@
           <strong>Parent A pays about $913 per month</strong>. Add health insurance premiums, a shared-custody schedule
           or a different income and the result changes, which is why it helps to run your own numbers.
         </p>
-        <p><a class="text-cta" href="calculator.html">Run your own numbers in the calculator &rarr;</a></p>
+        <p><a class="text-cta" href="calculator.html">Run your own numbers for $9.99 &rarr;</a></p>
       </div>
     </section>
 
     <!-- ── FAQ ───────────────────────────────────────────────── -->
-    <section class="lp-section lp-alt" aria-labelledby="faq-heading">
+    <section class="lp-section" aria-labelledby="faq-heading">
       <div class="lp-inner narrow">
         <h2 id="faq-heading" class="section-title">Nebraska child support FAQ</h2>
         <div class="faq">
@@ -334,7 +411,15 @@
           </details>
           <details>
             <summary>How much does it cost?</summary>
-            <p>Entering your numbers, seeing the running totals and using the Table 1 and deduction tools is free. Finalizing a calculation is a one-time fee, paid securely through Stripe. There is no subscription and no account to create.</p>
+            <p>$9.99 per calculation. Entering your numbers, seeing the running totals and using the Table 1 and deduction tools is free, so you can check everything before you pay. When you are ready for the final result, you pay a one-time $9.99 through Stripe's secure checkout. There is no subscription, no account and nothing that renews.</p>
+          </details>
+          <details>
+            <summary>Do I need a subscription or an account?</summary>
+            <p>No. Each calculation is a single $9.99 payment. There is no monthly or annual plan, no account to create and nothing to cancel later.</p>
+          </details>
+          <details>
+            <summary>What if I need to change my numbers?</summary>
+            <p>Viewing the same result again, for example after a refresh or to print it, is free. Each new set of numbers is a new calculation at $9.99.</p>
           </details>
           <details>
             <summary>Is this calculator a substitute for a lawyer or a court order?</summary>
@@ -347,8 +432,8 @@
     <!-- ── Final CTA ─────────────────────────────────────────── -->
     <section class="final-cta" aria-labelledby="final-cta-heading">
       <div class="lp-inner">
-        <h2 id="final-cta-heading">Get your Nebraska child support estimate</h2>
-        <p>Walk through income, Table 1, insurance and parenting time step by step, and leave with a printable summary.</p>
+        <h2 id="final-cta-heading">Get your Nebraska child support number for $9.99</h2>
+        <p>No subscription, no account, nothing to cancel. Fill it in free, pay once when you're ready, and leave with a printable summary.</p>
         <a class="btn btn-gold btn-lg" href="calculator.html">Start Your Calculation</a>
       </div>
     </section>
@@ -383,14 +468,14 @@
 
   <!-- Sticky mobile call to action -->
   <div class="mobile-cta" id="mobile-cta">
-    <a class="btn btn-gold" href="calculator.html">Start Your Calculation</a>
+    <a class="btn btn-gold" href="calculator.html">Start Your Calculation · $9.99</a>
   </div>
   <script>
     // Show the sticky mobile CTA only once the hero buttons scroll out of view
-    // and hide it again over the closing CTA, so there's never a duplicate on screen.
+    // and hide it again over the pricing and closing CTAs, so there's never a duplicate on screen.
     (function () {
       var bar = document.getElementById('mobile-cta');
-      var targets = document.querySelectorAll('.hero-actions, .final-cta');
+      var targets = document.querySelectorAll('.hero-actions, .price-cta, .final-cta');
       if (!('IntersectionObserver' in window)) { bar.classList.add('is-visible'); return; }
       var inView = new Set();
       var io = new IntersectionObserver(function (entries) {

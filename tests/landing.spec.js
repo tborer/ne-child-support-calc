@@ -20,3 +20,22 @@ test('landing page structured data is valid JSON', async ({ page }) => {
   const types = data['@graph'].map((node) => node['@type']);
   expect(types).toEqual(expect.arrayContaining(['WebSite', 'WebApplication', 'FAQPage']));
 });
+
+test('landing page sells the one-time price', async ({ page }) => {
+  await page.goto('/');
+  await expect(page).toHaveTitle(/\$9\.99, No Subscription/);
+  await expect(page.locator('#pricing .price-amount')).toHaveText('$9.99');
+  await expect(page.locator('#pricing .price-terms')).toContainText('No subscription');
+
+  const json = await page.locator('script[type="application/ld+json"]').textContent();
+  const graph = JSON.parse(json || '')['@graph'];
+  const app = graph.find((node) => node['@type'] === 'WebApplication');
+  expect(app.offers).toMatchObject({ '@type': 'Offer', price: '9.99', priceCurrency: 'USD' });
+
+  // Every FAQ answer in the structured data is also visible on the page.
+  const faq = graph.find((node) => node['@type'] === 'FAQPage');
+  await expect(page.locator('.faq details')).toHaveCount(faq.mainEntity.length);
+
+  await page.getByRole('link', { name: 'What $9.99 Gets You' }).click();
+  await expect(page.locator('#pricing')).toBeInViewport();
+});
