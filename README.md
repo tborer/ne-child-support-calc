@@ -266,6 +266,17 @@ inputs. The paid session in Stripe is the record of each purchase.
 
 No webhook or Payment Link is needed; the redirect URLs are set in code.
 
+### Promotion codes
+
+Checkout shows an **Add promotion code** field (`allow_promotion_codes:
+true` in `lib/payments.js`). To create codes: in the Stripe Dashboard go to
+**Product catalog → Coupons**, create a coupon (percent or amount off, and
+optionally limit it to this product), then add a customer-facing
+**promotion code** to it (e.g. `LAUNCH20`). Coupons and codes exist separately
+in test and live mode, so create them in each. A 100%-off code works: the
+session completes with `no_payment_required` and the result is released as
+if paid.
+
 ### Environment variables
 
 | Variable            | Used by | Required | Value |
