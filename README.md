@@ -300,7 +300,7 @@ if paid.
 | `STRIPE_PRICE_ID`   | `/api` at runtime | Yes | The one-time Price ID (`price_…`) from the same Stripe mode as the key. |
 | `ENABLE_STRIPE`     | build (page) | Yes | `true` enables the Finalize button. Without it the button is disabled with a "not yet enabled" note. |
 | `SITE_URL`          | build + `/api` | Recommended | Production URL with trailing slash, e.g. `https://example.com/`. Used for canonical/sitemap URLs and Stripe's return URLs. Falls back to Vercel's production domain. Preview deployments always return to their own preview URL. |
-| `PRICE_LABEL`       | build (page) | Optional | Price shown next to Finalize, e.g. `$9.99`. Keep it in sync with the Stripe Price. |
+| `PRICE_LABEL`       | build (page) | Optional | Price shown next to Finalize and throughout the landing page, e.g. `$9.99` (the default written in `index.html`). The build also updates the landing page's JSON-LD `Offer` price. Keep it in sync with the Stripe Price. |
 | `GOOGLE_SITE_VERIFICATION` | build (page) | Optional | Search Console HTML-tag token (see [Google Search Console](#google-search-console)). |
 
 `VERCEL_ENV`, `VERCEL_URL` and `VERCEL_PROJECT_PRODUCTION_URL` are set by

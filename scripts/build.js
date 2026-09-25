@@ -8,6 +8,7 @@
 //      from the checked-in GitHub Pages address to SITE_URL.
 //   3. Writes dist/js/config.js from the Stripe environment variables.
 //   4. Sets the Google Search Console verification tag on the home page.
+//   5. Replaces the landing page's $9.99 price with PRICE_LABEL, if set.
 //
 // Environment variables (all optional):
 //   SITE_URL                 Public base URL, e.g. https://example.com/
@@ -15,7 +16,9 @@
 //   ENABLE_STRIPE            "true" enables the Finalize (paid) button. The
 //                            server side also needs STRIPE_SECRET_KEY and
 //                            STRIPE_PRICE_ID (read by /api at runtime).
-//   PRICE_LABEL              Price shown next to Finalize, e.g. "$9.99".
+//   PRICE_LABEL              Price shown next to Finalize and on the landing
+//                            page, e.g. "$9.99" (the default written in
+//                            index.html).
 //   GOOGLE_SITE_VERIFICATION Google Search Console "HTML tag" token. Either
 //                            the content value or the whole <meta> tag;
 //                            comma-separate several. Replaces the token
@@ -80,6 +83,25 @@ function applyVerification(file, tokens) {
   fs.writeFileSync(file, html.replace(VERIFICATION_TAG, tags));
 }
 
+// The price written in the source landing page.
+const SOURCE_PRICE_LABEL = '$9.99';
+
+/**
+ * Rewrite the landing page's price for PRICE_LABEL: every "$9.99" in the
+ * copy, the big number in the pricing card, and the JSON-LD Offer price.
+ */
+function applyPrice(file, label) {
+  const amount = (label.match(/\d[\d,]*(?:\.\d+)?/) || [''])[0].replace(/,/g, '');
+  if (!amount) throw new Error(`PRICE_LABEL "${label}" has no number in it`);
+  const [whole, cents] = SOURCE_PRICE_LABEL.slice(1).split('.');
+  let html = fs.readFileSync(file, 'utf8');
+  html = html.split(SOURCE_PRICE_LABEL).join(label);
+  html = html.replace(`<span class="price-currency">$</span>${whole}.${cents}`,
+    `<span class="price-currency">${label.replace(/\d[\d,.]*/, '').trim() || '$'}</span>${amount}`);
+  html = html.replace(`"price": "${whole}.${cents}"`, `"price": "${amount}"`);
+  fs.writeFileSync(file, html);
+}
+
 function build() {
   fs.rmSync(DIST, { recursive: true, force: true });
   fs.mkdirSync(DIST);
@@ -102,6 +124,9 @@ function build() {
     console.warn('GOOGLE_SITE_VERIFICATION is set but has no valid token; keeping the checked-in tag.');
   }
   if (tokens.length) applyVerification(path.join(DIST, 'index.html'), tokens);
+
+  const priceLabel = (process.env.PRICE_LABEL || '').trim();
+  if (priceLabel && priceLabel !== SOURCE_PRICE_LABEL) applyPrice(path.join(DIST, 'index.html'), priceLabel);
 
   const config = {
     ENABLE_STRIPE: process.env.ENABLE_STRIPE === 'true',
