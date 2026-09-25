@@ -548,7 +548,8 @@ jQuery(document).ready(function ($) {
   });
 
   // ── Print (popup window with formatted table) ───────────────────
-  $('#print-calc').on('click', function () {
+  // Sidebar Print button and the duplicate under Finalize Calculation
+  $('#print-calc, #print-calc-bottom').on('click', function () {
     const printWindow   = window.open('', '_blank');
     const printDocument = printWindow.document;
 

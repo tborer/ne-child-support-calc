@@ -657,7 +657,8 @@ input.computed-field:focus {
 /* Hide the SVG chevron — we use ::before instead */
 .accordion-toggle svg { display: none; }
 
-#print-calc {
+#print-calc,
+#print-calc-bottom {
   border: 2px solid var(--blue);
   background-color: var(--blue);
   border-radius: var(--radius-lg);
@@ -675,10 +676,12 @@ input.computed-field:focus {
   font-weight: normal;
 }
 
-#print-calc:hover { background-color: var(--blue-hover); }
+#print-calc:hover,
+#print-calc-bottom:hover { background-color: var(--blue-hover); }
 
 /* Hide the SVG inside print button since original has text only */
-#print-calc svg { display: none; }
+#print-calc svg,
+#print-calc-bottom svg { display: none; }
 
 #finalize-calculation {
   border: 2px solid var(--blue);
@@ -960,6 +963,7 @@ input.computed-field:focus {
   .site-nav,
   .right-sidebar,
   #finalize-calculation,
+  #print-calc-bottom,
   .disclaimer svg { display: none; }
 
   body { background: white; }
