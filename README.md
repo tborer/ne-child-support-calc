@@ -102,10 +102,11 @@ Browser alerts and on-page messages flag the conditions the guidelines care abou
 
   The tests never contact Stripe or the jQuery CDN (jQuery is served from
   `node_modules`, pinned to the page's 3.6.0).
-- **Deployment** — Vercel builds and deploys from `vercel.json`. GitHub
-  Actions still deploys the static pages to GitHub Pages
-  (`.github/workflows/deploy.yml`) with payments turned off, because Pages
-  can't run the `/api` functions. A manually triggered test workflow
+- **Deployment** — Vercel builds and deploys from `vercel.json`: every
+  push gets a preview, and `main` goes to production. The old GitHub Pages
+  workflow (`.github/workflows/deploy.yml`) now only runs when started
+  manually, with payments turned off because Pages can't run the `/api`
+  functions. A manually triggered test workflow
   (`.github/workflows/test.yml`) uploads the Playwright HTML report.
 
 ## Running locally
@@ -195,9 +196,23 @@ to change when the domain does.
 
 ## Google Search Console
 
-`index.html` includes a `google-site-verification` meta tag to verify site
-ownership in Google Search Console. It only needs to live on one page (the
-one Search Console fetches at the domain root).
+The home page carries a `google-site-verification` meta tag for Search
+Console's **HTML tag** verification method. Set it with the
+`GOOGLE_SITE_VERIFICATION` environment variable (Vercel → Settings →
+Environment Variables, Production scope), then redeploy:
+
+- Paste either the whole tag Search Console shows
+  (`<meta name="google-site-verification" content="abc123…" />`) or just the
+  `content` value (`abc123…`).
+- For more than one property or owner, separate tokens with commas; each
+  becomes its own tag.
+- `scripts/build.js` swaps it into `dist/index.html` at build time. When the
+  variable is unset (or has no valid token) the tag checked into
+  `index.html` — the original GitHub Pages token — is kept.
+
+After the redeploy, check that `https://<domain>/` shows the new tag in
+View Source, then click **Verify** in Search Console. Keep the variable set
+afterwards; Google re-checks the tag periodically.
 
 ## Deploying to Vercel
 
@@ -286,6 +301,7 @@ if paid.
 | `ENABLE_STRIPE`     | build (page) | Yes | `true` enables the Finalize button. Without it the button is disabled with a "not yet enabled" note. |
 | `SITE_URL`          | build + `/api` | Recommended | Production URL with trailing slash, e.g. `https://example.com/`. Used for canonical/sitemap URLs and Stripe's return URLs. Falls back to Vercel's production domain. Preview deployments always return to their own preview URL. |
 | `PRICE_LABEL`       | build (page) | Optional | Price shown next to Finalize, e.g. `$9.99`. Keep it in sync with the Stripe Price. |
+| `GOOGLE_SITE_VERIFICATION` | build (page) | Optional | Search Console HTML-tag token (see [Google Search Console](#google-search-console)). |
 
 `VERCEL_ENV`, `VERCEL_URL` and `VERCEL_PROJECT_PRODUCTION_URL` are set by
 Vercel automatically (keep **Automatically expose System Environment

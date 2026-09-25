@@ -7,6 +7,7 @@
 //   2. Rewrites absolute URLs (canonical, og:url, JSON-LD, sitemap, robots)
 //      from the checked-in GitHub Pages address to SITE_URL.
 //   3. Writes dist/js/config.js from the Stripe environment variables.
+//   4. Sets the Google Search Console verification tag on the home page.
 //
 // Environment variables (all optional):
 //   SITE_URL                 Public base URL, e.g. https://example.com/
@@ -15,6 +16,10 @@
 //                            server side also needs STRIPE_SECRET_KEY and
 //                            STRIPE_PRICE_ID (read by /api at runtime).
 //   PRICE_LABEL              Price shown next to Finalize, e.g. "$9.99".
+//   GOOGLE_SITE_VERIFICATION Google Search Console "HTML tag" token. Either
+//                            the content value or the whole <meta> tag;
+//                            comma-separate several. Replaces the token
+//                            checked into index.html.
 
 const fs = require('fs');
 const path = require('path');
@@ -49,6 +54,32 @@ function resolveSiteUrl() {
   return url.endsWith('/') ? url : `${url}/`;
 }
 
+/**
+ * Tokens from GOOGLE_SITE_VERIFICATION. Accepts the bare token or the full
+ * tag Search Console shows (<meta name="google-site-verification" content="…" />),
+ * comma-separated for more than one.
+ */
+function verificationTokens(value) {
+  if (!value) return [];
+  return value.split(',')
+    .map((part) => {
+      const match = part.match(/content\s*=\s*["']([^"']+)["']/i);
+      return (match ? match[1] : part).trim();
+    })
+    .filter((token) => /^[\w-]{10,100}$/.test(token));
+}
+
+const VERIFICATION_TAG = /^[ \t]*<meta name="google-site-verification"[^>]*>[ \t]*\n/m;
+
+function applyVerification(file, tokens) {
+  const html = fs.readFileSync(file, 'utf8');
+  if (!VERIFICATION_TAG.test(html)) throw new Error(`No google-site-verification tag in ${file}`);
+  const tags = tokens
+    .map((token) => `  <meta name="google-site-verification" content="${token}" />\n`)
+    .join('');
+  fs.writeFileSync(file, html.replace(VERIFICATION_TAG, tags));
+}
+
 function build() {
   fs.rmSync(DIST, { recursive: true, force: true });
   fs.mkdirSync(DIST);
@@ -65,6 +96,13 @@ function build() {
     }
   }
 
+  const rawVerification = process.env.GOOGLE_SITE_VERIFICATION;
+  const tokens = verificationTokens(rawVerification);
+  if (rawVerification && !tokens.length) {
+    console.warn('GOOGLE_SITE_VERIFICATION is set but has no valid token; keeping the checked-in tag.');
+  }
+  if (tokens.length) applyVerification(path.join(DIST, 'index.html'), tokens);
+
   const config = {
     ENABLE_STRIPE: process.env.ENABLE_STRIPE === 'true',
     PRICE_LABEL: process.env.PRICE_LABEL || '',
@@ -75,7 +113,8 @@ function build() {
       `window.APP_CONFIG = ${JSON.stringify(config, null, 2)};\n`
   );
 
-  console.log(`Built dist/ for ${siteUrl} (Stripe ${config.ENABLE_STRIPE ? 'on' : 'off'})`);
+  console.log(`Built dist/ for ${siteUrl} (Stripe ${config.ENABLE_STRIPE ? 'on' : 'off'}, ` +
+    `Google verification ${tokens.length ? `${tokens.length} token(s) from env` : 'checked-in tag'})`);
 }
 
 build();
