@@ -64,6 +64,7 @@ test('checkout creates a one-time session with the input hash, not the inputs', 
   assert.strictEqual(headers['cache-control'], 'no-store');
   const params = calls[0];
   assert.strictEqual(params.mode, 'payment');
+  assert.strictEqual(params.allow_promotion_codes, true);
   assert.deepStrictEqual(params.line_items, [{ price: 'price_123', quantity: 1 }]);
   assert.strictEqual(params.success_url, 'https://example.com/calculator.html?session_id={CHECKOUT_SESSION_ID}');
   assert.strictEqual(params.cancel_url, 'https://example.com/calculator.html?checkout=canceled');
@@ -105,6 +106,15 @@ test('calculate returns the result for a paid session with matching inputs', asy
   const { status, body } = await call(handler, { sessionId: SESSION_ID, inputs: INPUTS });
   assert.strictEqual(status, 200);
   assert.deepStrictEqual(body, { calcType: 'joint-calc', result: { mother: 70, father: 0 } });
+});
+
+test('calculate accepts a session fully covered by a promotion code', async () => {
+  const handler = createCalculateHandler({
+    getStripe: stripeWith(paidSession({ payment_status: 'no_payment_required' })), env: ENV,
+  });
+  const { status, body } = await call(handler, { sessionId: SESSION_ID, inputs: INPUTS });
+  assert.strictEqual(status, 200);
+  assert.deepStrictEqual(body.result, { mother: 70, father: 0 });
 });
 
 test('calculate refuses an unpaid session', async () => {
