@@ -1,8 +1,11 @@
 name: Deploy to GitHub Pages
 
+# The site is deployed by Vercel (see vercel.json). This GitHub Pages
+# workflow is kept for the migration (e.g. publishing redirect pages to the
+# old github.io URL) and only runs when started manually from the Actions
+# tab. Running it on push failed on every branch the repo's "github-pages"
+# environment protection rules don't allow.
 on:
-  push:
-    branches: [main, master, "claude/**"]
   workflow_dispatch:
 
 permissions:

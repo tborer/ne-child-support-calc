@@ -102,10 +102,11 @@ Browser alerts and on-page messages flag the conditions the guidelines care abou
 
   The tests never contact Stripe or the jQuery CDN (jQuery is served from
   `node_modules`, pinned to the page's 3.6.0).
-- **Deployment** — Vercel builds and deploys from `vercel.json`. GitHub
-  Actions still deploys the static pages to GitHub Pages
-  (`.github/workflows/deploy.yml`) with payments turned off, because Pages
-  can't run the `/api` functions. A manually triggered test workflow
+- **Deployment** — Vercel builds and deploys from `vercel.json`: every
+  push gets a preview, and `main` goes to production. The old GitHub Pages
+  workflow (`.github/workflows/deploy.yml`) now only runs when started
+  manually, with payments turned off because Pages can't run the `/api`
+  functions. A manually triggered test workflow
   (`.github/workflows/test.yml`) uploads the Playwright HTML report.
 
 ## Running locally
